@@ -8,7 +8,7 @@ import (
 )
 
 func TestText(t *testing.T) {
-	fmt.Println("*** text ***")
+	fmt.Println("*** colored text ***")
 	fmt.Println(color.Black("black"))
 	fmt.Println(color.Red("red"))
 	fmt.Println(color.Green("green"))
@@ -21,7 +21,7 @@ func TestText(t *testing.T) {
 }
 
 func TestBackground(t *testing.T) {
-	fmt.Println("*** background ***")
+	fmt.Println("*** colored background ***")
 	fmt.Println(color.BlackBg("black background", color.Wht))
 	fmt.Println(color.RedBg("red background"))
 	fmt.Println(color.GreenBg("green background"))

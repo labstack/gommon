@@ -2,8 +2,9 @@
 Color package for go.
 
 ### Example
+[labstack/gommon/color] (https://github.com/labstack/gommon/blob/master/color/color_test.go)
 ```go
-fmt.Println("*** text ***")
+// Colored text
 fmt.Println(color.Black("black"))
 fmt.Println(color.Red("red"))
 fmt.Println(color.Green("green"))
@@ -16,7 +17,7 @@ fmt.Println(color.Grey("grey"))
 ```
 
 ```go
-fmt.Println("*** background ***")
+// Colored background
 fmt.Println(color.BlackBg("black background", color.Wht))
 fmt.Println(color.RedBg("red background"))
 fmt.Println(color.GreenBg("green background"))
@@ -28,6 +29,7 @@ fmt.Println(color.WhiteBg("white background"))
 ```
 
 ```go
+// Emphasis
 fmt.Println("*** emphasis ***")
 fmt.Println(color.Bold("bold"))
 fmt.Println(color.Dim("dim"))
@@ -39,6 +41,7 @@ fmt.Println(color.Strikeout("strikeout"))
 ```
 
 ```go
+// Combo
 fmt.Println("*** combo ***")
 fmt.Println(Green("bold green with white background", B, WhtBg))
 fmt.Println(Red("underline red", U))
