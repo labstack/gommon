@@ -51,4 +51,4 @@ fmt.Println(Red("underline red", U))
 fmt.Println(Yellow("dim yellow", D))
 fmt.Println(Cyan("inverse cyan", In))
 ```
-![Combo](http://i.imgur.com/QSleDYA.png)
+![Combo](http://i.imgur.com/KPoXVfJ.png)
