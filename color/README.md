@@ -1,7 +1,10 @@
 ### Gommon/color
 Color package for go.
 
-### Example
+### Installation
+```go get github.com/labstack/gommon/color```
+
+### Usage
 [labstack/gommon/color](https://github.com/labstack/gommon/blob/master/color/color_test.go)
 ```go
 // Colored text
