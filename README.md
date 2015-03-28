@@ -1,2 +1,2 @@
 # Gommon
-Common go library
+Common packages for Go
