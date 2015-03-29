@@ -3,44 +3,42 @@ package color
 import (
 	"fmt"
 	"testing"
-
-	"github.com/labstack/gommon/color"
 )
 
 func TestText(t *testing.T) {
 	fmt.Println("*** colored text ***")
-	fmt.Println(color.Black("black"))
-	fmt.Println(color.Red("red"))
-	fmt.Println(color.Green("green"))
-	fmt.Println(color.Yellow("yellow"))
-	fmt.Println(color.Blue("blue"))
-	fmt.Println(color.Magenta("magenta"))
-	fmt.Println(color.Cyan("cyan"))
-	fmt.Println(color.White("white"))
-	fmt.Println(color.Grey("grey"))
+	fmt.Println(Black("black"))
+	fmt.Println(Red("red"))
+	fmt.Println(Green("green"))
+	fmt.Println(Yellow("yellow"))
+	fmt.Println(Blue("blue"))
+	fmt.Println(Magenta("magenta"))
+	fmt.Println(Cyan("cyan"))
+	fmt.Println(White("white"))
+	fmt.Println(Grey("grey"))
 }
 
 func TestBackground(t *testing.T) {
 	fmt.Println("*** colored background ***")
-	fmt.Println(color.BlackBg("black background", color.Wht))
-	fmt.Println(color.RedBg("red background"))
-	fmt.Println(color.GreenBg("green background"))
-	fmt.Println(color.YellowBg("yellow background"))
-	fmt.Println(color.BlueBg("blue background"))
-	fmt.Println(color.MagentaBg("magenta background"))
-	fmt.Println(color.CyanBg("cyan background"))
-	fmt.Println(color.WhiteBg("white background"))
+	fmt.Println(BlackBg("black background", Wht))
+	fmt.Println(RedBg("red background"))
+	fmt.Println(GreenBg("green background"))
+	fmt.Println(YellowBg("yellow background"))
+	fmt.Println(BlueBg("blue background"))
+	fmt.Println(MagentaBg("magenta background"))
+	fmt.Println(CyanBg("cyan background"))
+	fmt.Println(WhiteBg("white background"))
 }
 
 func TestEmphasis(t *testing.T) {
 	fmt.Println("*** emphasis ***")
-	fmt.Println(color.Bold("bold"))
-	fmt.Println(color.Dim("dim"))
-	fmt.Println(color.Italic("italic"))
-	fmt.Println(color.Underline("underline"))
-	fmt.Println(color.Inverse("inverse"))
-	fmt.Println(color.Hidden("hidden"))
-	fmt.Println(color.Strikeout("strikeout"))
+	fmt.Println(Bold("bold"))
+	fmt.Println(Dim("dim"))
+	fmt.Println(Italic("italic"))
+	fmt.Println(Underline("underline"))
+	fmt.Println(Inverse("inverse"))
+	fmt.Println(Hidden("hidden"))
+	fmt.Println(Strikeout("strikeout"))
 }
 
 func TestMixMatch(t *testing.T) {
