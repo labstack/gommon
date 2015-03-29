@@ -43,8 +43,8 @@ func TestEmphasis(t *testing.T) {
 	fmt.Println(color.Strikeout("strikeout"))
 }
 
-func TestCombo(t *testing.T) {
-	fmt.Println("*** combo ***")
+func TestMixMatch(t *testing.T) {
+	fmt.Println("*** mix and match ***")
 	fmt.Println(Green("bold green with white background", B, WhtBg))
 	fmt.Println(Red("underline red", U))
 	fmt.Println(Yellow("dim yellow", D))
