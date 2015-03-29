@@ -1,3 +1,3 @@
 # Gommon
 Common packages for Go
-- [color](https://github.com/labstack/gommon/tree/master/color)
+- [color](https://github.com/labstack/gommon/tree/master/color) - Style terminal text.
