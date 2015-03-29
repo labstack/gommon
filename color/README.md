@@ -1,4 +1,4 @@
-### Gommon/color
+# Color
 Style terminal text.
 
 ### Installation
