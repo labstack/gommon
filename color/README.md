@@ -50,5 +50,6 @@ fmt.Println(Green("bold green with white background", B, WhtBg))
 fmt.Println(Red("underline red", U))
 fmt.Println(Yellow("dim yellow", D))
 fmt.Println(Cyan("inverse cyan", In))
+fmt.Println(Blue("bold underline dim blue", B, U, D))
 ```
-![Combo](http://i.imgur.com/KPoXVfJ.png)
+![Combo](http://i.imgur.com/jWGq9Ca.png)

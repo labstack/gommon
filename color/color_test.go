@@ -49,4 +49,5 @@ func TestCombo(t *testing.T) {
 	fmt.Println(Red("underline red", U))
 	fmt.Println(Yellow("dim yellow", D))
 	fmt.Println(Cyan("inverse cyan", In))
+	fmt.Println(Blue("bold underline dim blue", B, U, D))
 }
