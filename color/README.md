@@ -1,5 +1,5 @@
 ### Gommon/color
-Color package for go.
+Color and format terminal text.
 
 ### Installation
 ```go get github.com/labstack/gommon/color```
