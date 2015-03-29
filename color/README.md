@@ -1,5 +1,5 @@
 ### Gommon/color
-Color and format terminal text.
+Style terminal text.
 
 ### Installation
 ```go get github.com/labstack/gommon/color```
