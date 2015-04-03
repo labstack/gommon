@@ -1,4 +1,3 @@
-# Gommon
-[![GoDoc](http://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](http://godoc.org/github.com/labstack/gommon) [![Build Status](http://img.shields.io/travis/fatih/structs.svg?style=flat-square)](https://travis-ci.org/labstack/gommon) [![Coverage Status](http://img.shields.io/coveralls/labstack/gommon.svg?style=flat-square)](https://coveralls.io/r/labstack/gommon)
+# Gommon [![GoDoc](http://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](http://godoc.org/github.com/labstack/gommon) [![Build Status](http://img.shields.io/travis/labstack/gommon.svg?style=flat-square)](https://travis-ci.org/labstack/gommon) [![Coverage Status](http://img.shields.io/coveralls/labstack/gommon.svg?style=flat-square)](https://coveralls.io/r/labstack/gommon)
 Common packages for Go
 - [Color](https://github.com/labstack/gommon/tree/master/color) - Style terminal text.
