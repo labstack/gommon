@@ -10,9 +10,7 @@ Style terminal text.
 
 Try [cmder](http://bliker.github.io/cmder) or https://github.com/mattn/go-colorable
 
-## Usage
-
-[labstack/gommon/color](https://github.com/labstack/gommon/blob/master/color/color_test.go)
+## [Usage](https://github.com/labstack/gommon/blob/master/color/color_test.go)
 
 ### Colored text
 
