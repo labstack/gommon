@@ -32,6 +32,7 @@ func TestBackground(t *testing.T) {
 
 func TestEmphasis(t *testing.T) {
 	fmt.Println("*** emphasis ***")
+	fmt.Println(Reset("reset"))
 	fmt.Println(Bold("bold"))
 	fmt.Println(Dim("dim"))
 	fmt.Println(Italic("italic"))
