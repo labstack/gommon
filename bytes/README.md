@@ -1,6 +1,6 @@
 # Bytes
 
-Format bytes
+Format bytes to string
 
 ## Installation
 
