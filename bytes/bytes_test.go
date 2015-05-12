@@ -1,21 +1,10 @@
 package bytes
 
-import (
-	"testing"
-	"github.com/labstack/gommon/bytes"
-	"fmt"
-)
+import "testing"
 
 func TestFormat(t *testing.T) {
-	fmt.Println(bytes.Format(1323))
-	// Zero
-	f := Format(0)
-	if f != "--" {
-		t.Errorf("formatted bytes should be --, found %s", f)
-	}
-
 	// B
-	f = Format(515)
+	f := Format(515)
 	if f != "515 B" {
 		t.Errorf("formatted bytes should be 515 B, found %s", f)
 	}

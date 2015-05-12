@@ -13,6 +13,8 @@ var (
 func BinaryPrefix(on bool) {
 	if on {
 		sfx = "iB"
+	} else {
+		sfx = "B"
 	}
 }
 
@@ -21,9 +23,7 @@ func Format(b uint64) string {
 	n := float64(b)
 	unit := float64(1024)
 
-	if n == 0 {
-		return "--"
-	} else if n < unit {
+	if n < unit {
 		return fmt.Sprintf("%.0f B", n)
 	} else {
 		e := math.Floor(math.Log(n) / math.Log(unit))
