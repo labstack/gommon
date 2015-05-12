@@ -1,13 +1,19 @@
 # Color
+
 Style terminal text.
 
-### Installation
+## Installation
+
 ```go get github.com/labstack/gommon/color```
 
-### Usage
-[labstack/gommon/color](https://github.com/labstack/gommon/blob/master/color/color_test.go)
+## Windows?
 
-#### Colored text
+Try [cmder](http://bliker.github.io/cmder) or https://github.com/mattn/go-colorable
+
+## [Usage](https://github.com/labstack/gommon/blob/master/color/color_test.go)
+
+### Colored text
+
 ```go
 fmt.Println(color.Black("black"))
 fmt.Println(color.Red("red"))
@@ -21,7 +27,8 @@ fmt.Println(color.Grey("grey"))
 ```
 ![Colored Text](http://i.imgur.com/8RtY1QR.png)
 
-#### Colored background
+### Colored background
+
 ```go
 fmt.Println(color.BlackBg("black background", color.Wht))
 fmt.Println(color.RedBg("red background"))
@@ -34,7 +41,8 @@ fmt.Println(color.WhiteBg("white background"))
 ```
 ![Colored Background](http://i.imgur.com/SrrS6lw.png)
 
-#### Emphasis
+### Emphasis
+
 ```go
 fmt.Println(color.Bold("bold"))
 fmt.Println(color.Dim("dim"))
@@ -46,7 +54,8 @@ fmt.Println(color.Strikeout("strikeout"))
 ```
 ![Emphasis](http://i.imgur.com/3RSJBbc.png)
 
-#### Mix and match
+### Mix and match
+
 ```go
 fmt.Println(color.Green("bold green with white background", color.B, color.WhtBg))
 fmt.Println(color.Red("underline red", color.U))
