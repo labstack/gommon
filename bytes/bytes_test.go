@@ -18,13 +18,13 @@ func TestFormat(t *testing.T) {
 	// Exact
 	f = Format(1000 * 1000 * 1000)
 	if f != "1.00 GB" {
-		t.Errorf("formatted bytes should be 1.00 GB, found %s", f)
+		t.Errorf("formatted bytes should be 1.00 GB, found %s xxx", f)
 	}
 }
 
 func TestFormatB(t *testing.T) {
 	f := FormatB(1323)
 	if f != "1.29 KiB" {
-		t.Errorf("formatted bytes should be 1.29 KiB, found %s", f)
+		t.Errorf("formatted bytes should be 1.29 KiB, found %s xxx", f)
 	}
 }

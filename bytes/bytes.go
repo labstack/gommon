@@ -1,7 +1,6 @@
 package bytes
 
 import (
-	"bytes"
 	"fmt"
 	"math"
 )
@@ -26,12 +25,13 @@ func format(b float64, bin bool) string {
 	if b < unit {
 		return fmt.Sprintf("%.0f B", b)
 	} else {
-		exp := math.Floor(math.Log(b) / math.Log(unit))
-		pfx := new(bytes.Buffer)
-		pfx.WriteByte("KMGTPE"[uint8(exp)-1])
+		i := uint8(math.Floor(math.Log(b) / math.Log(unit)))
+		pre := make([]byte, 1, 2)
+		pre[0] = "KMGTPE"[i-1]
 		if bin {
-			pfx.WriteString("i")
+			pre = pre[:2]
+			pre[1] = 'i'
 		}
-		return fmt.Sprintf("%.02f %sB", b/math.Pow(unit, exp), pfx)
+		return fmt.Sprintf("%.02f %sB", b/math.Pow(unit, i), pre)
 	}
 }
