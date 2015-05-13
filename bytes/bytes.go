@@ -25,13 +25,13 @@ func format(b float64, bin bool) string {
 	if b < unit {
 		return fmt.Sprintf("%.0f B", b)
 	} else {
-		i := uint8(math.Floor(math.Log(b) / math.Log(unit)))
+		x := math.Floor(math.Log(b) / math.Log(unit))
 		pre := make([]byte, 1, 2)
-		pre[0] = "KMGTPE"[i-1]
+		pre[0] = "KMGTPE"[uint8(x)-1]
 		if bin {
 			pre = pre[:2]
 			pre[1] = 'i'
 		}
-		return fmt.Sprintf("%.02f %sB", b/math.Pow(unit, i), pre)
+		return fmt.Sprintf("%.02f %sB", b/math.Pow(unit, x), pre)
 	}
 }
