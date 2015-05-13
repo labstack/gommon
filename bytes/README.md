@@ -19,7 +19,7 @@ fmt.Println(bytes.Format(1323))
 ### Binary prefix
 
 ```go
-fmt.Println(bytes.FormatBin(1323))
+fmt.Println(bytes.FormatB(1323))
 ```
 
 `1.29 KiB`

@@ -22,8 +22,8 @@ func TestFormat(t *testing.T) {
 	}
 }
 
-func TestFormatBin(t *testing.T) {
-	f := FormatBin(1323)
+func TestFormatB(t *testing.T) {
+	f := FormatB(1323)
 	if f != "1.29 KiB" {
 		t.Errorf("formatted bytes should be 1.29 KiB, found %s", f)
 	}
