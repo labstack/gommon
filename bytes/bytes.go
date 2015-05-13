@@ -1,33 +1,36 @@
 package bytes
 
 import (
+	"bytes"
 	"fmt"
 	"math"
 )
 
-var (
-	sfx = "B"
-)
-
-// BinaryPrefix sets binary prefix as specified by ICE standard. For example, 13.23 MiB.
-func BinaryPrefix(on bool) {
-	if on {
-		sfx = "iB"
-	} else {
-		sfx = "B"
-	}
+// Format formats bytes to string. For example, 1024 returns 1 KB
+func Format(b uint64) string {
+	return format(float64(b), false)
 }
 
-// Bytes formats bytes into string. For example, 1024 returns 1 KB
-func Format(b uint64) string {
-	n := float64(b)
-	unit := float64(1024)
+// FormatBin formats bytes to string as specified by ICE standard. For example,
+// 13.23 MiB.
+func FormatBin(b uint64) string {
+	return format(float64(b), true)
+}
 
-	if n < unit {
-		return fmt.Sprintf("%.0f B", n)
+func format(b float64, bin bool) string {
+	unit := float64(1000)
+	if bin {
+		unit = 1024
+	}
+	if b < unit {
+		return fmt.Sprintf("%.0f B", b)
 	} else {
-		e := math.Floor(math.Log(n) / math.Log(unit))
-		pfx := "KMGTPE"[uint8(e)-1]
-		return fmt.Sprintf("%.02f %c%s", n/math.Pow(unit, e), pfx, sfx)
+		exp := math.Floor(math.Log(b) / math.Log(unit))
+		pfx := new(bytes.Buffer)
+		pfx.WriteByte("KMGTPE"[uint8(exp)-1])
+		if bin {
+			pfx.WriteString("i")
+		}
+		return fmt.Sprintf("%.02f %sB", b/math.Pow(unit, exp), pfx)
 	}
 }

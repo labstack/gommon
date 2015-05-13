@@ -11,20 +11,19 @@ func TestFormat(t *testing.T) {
 
 	// MB
 	f = Format(13231323)
-	if f != "12.62 MB" {
-		t.Errorf("formatted bytes should be 12.62 MB, found %s", f)
+	if f != "13.23 MB" {
+		t.Errorf("formatted bytes should be 13.23 MB, found %s", f)
 	}
 
 	// Exact
-	f = Format(1024 * 1024 * 1024)
+	f = Format(1000 * 1000 * 1000)
 	if f != "1.00 GB" {
 		t.Errorf("formatted bytes should be 1.00 GB, found %s", f)
 	}
 }
 
-func TestBinaryPrefix(t *testing.T) {
-	BinaryPrefix(true)
-	f := Format(1323)
+func TestFormatBin(t *testing.T) {
+	f := FormatBin(1323)
 	if f != "1.29 KiB" {
 		t.Errorf("formatted bytes should be 1.29 KiB, found %s", f)
 	}

@@ -4,7 +4,7 @@ Format bytes to string
 
 ## Installation
 
-```go get github.com/labstack/gommon/color```
+```go get github.com/labstack/gommon/bytes```
 
 ## [Usage](https://github.com/labstack/gommon/blob/master/bytes/bytes_test.go)
 
@@ -14,13 +14,12 @@ Format bytes to string
 fmt.Println(bytes.Format(1323))
 ```
 
-`1.29 KB`
+`1.32 KB`
 
 ### Binary prefix
 
 ```go
-bytes.BinaryPrefix(true)
-fmt.Println(bytes.Format(1323))
+fmt.Println(bytes.FormatBin(1323))
 ```
 
 `1.29 KiB`
