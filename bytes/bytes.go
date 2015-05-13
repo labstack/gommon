@@ -6,13 +6,13 @@ import (
 	"math"
 )
 
-// Format formats bytes to string. For example, 1024 returns 1 KB
+// Format formats bytes to string. For example, 1000 would returns 1 KB
 func Format(b uint64) string {
 	return format(float64(b), false)
 }
 
 // FormatBin formats bytes to string as specified by ICE standard. For example,
-// 13.23 MiB.
+// 1024 would return 1 KiB.
 func FormatBin(b uint64) string {
 	return format(float64(b), true)
 }
