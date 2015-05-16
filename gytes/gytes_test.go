@@ -45,4 +45,3 @@ func TestNew(t *testing.T) {
 		t.Errorf("expected `1.18 PiB`, got %s", b)
 	}
 }
-
