@@ -31,7 +31,13 @@ fmt.Println(gytes.Format(1323))
 
 `1.29 KiB`
 
-Above examples operate on global instance of Gytes. To create a new instance
+### New intance
 
 ```go
+g := New()
+// g.BinaryPrefix(true)
+fmt.Println(g.Format(13231323))
+```
+
+`13.23 MB`
 
