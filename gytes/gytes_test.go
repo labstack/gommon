@@ -39,6 +39,7 @@ func TestNew(t *testing.T) {
 
 	// Binary prefix
 	g.BinaryPrefix(true)
+	println(g.Format(13231323))
 	b = Format(1323132313231323)
 	if b != "1.18 PiB" {
 		t.Errorf("expected `1.18 PiB`, got %s", b)

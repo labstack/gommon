@@ -33,11 +33,21 @@ fmt.Println(gytes.Format(1323))
 
 ### New intance
 
+#### Decimal prefix 
+
 ```go
 g := New()
-// g.BinaryPrefix(true)
 fmt.Println(g.Format(13231323))
 ```
 
 `13.23 MB`
 
+#### Binary prefix
+
+```go
+g := New()
+g.BinaryPrefix(true)
+fmt.Println(g.Format(13231323))
+```
+
+`12.62 MiB`
