@@ -25,7 +25,7 @@ fmt.Println(gytes.Format(1323))
 ### Binary prefix
 
 ```go
-gytes.BinaryPrefix(true)
+gytes.SetBinaryPrefix(true)
 fmt.Println(gytes.Format(1323))
 ```
 
@@ -46,7 +46,7 @@ fmt.Println(g.Format(13231323))
 
 ```go
 g := New()
-g.BinaryPrefix(true)
+g.SetBinaryPrefix(true)
 fmt.Println(g.Format(13231323))
 ```
 
