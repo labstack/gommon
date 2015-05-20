@@ -20,8 +20,8 @@ func New() *Gytes {
 	return &Gytes{}
 }
 
-// BinaryPrefix turns on binary prefix format.
-func (g *Gytes) BinaryPrefix(on bool) {
+// SetBinaryPrefix sets binary prefix format.
+func (g *Gytes) SetBinaryPrefix(on bool) {
 	g.iec = on
 }
 
@@ -49,9 +49,9 @@ func (g *Gytes) Format(b uint64) string {
 	}
 }
 
-// BinaryPrefix wraps default instance's BinaryPrefix function.
+// SetBinaryPrefix wraps default instance's BinaryPrefix function.
 func BinaryPrefix(on bool) {
-	global.BinaryPrefix(on)
+	global.SetBinaryPrefix(on)
 }
 
 // Format wraps default instance's Format function.
