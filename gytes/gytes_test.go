@@ -29,19 +29,3 @@ func TestGytes(t *testing.T) {
 	}
 }
 
-func TestNew(t *testing.T) {
-	g := New()
-
-	b := g.Format(132313231323)
-	if b != "132.31 GB" {
-		t.Errorf("expected `132.31 GB`, got %s", b)
-	}
-
-	// Binary prefix
-	g.SetBinaryPrefix(true)
-	println(g.Format(13231323))
-	b = Format(1323132313231323)
-	if b != "1.18 PiB" {
-		t.Errorf("expected `1.18 PiB`, got %s", b)
-	}
-}

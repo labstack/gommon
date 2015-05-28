@@ -31,23 +31,9 @@ fmt.Println(gytes.Format(1323))
 
 `1.29 KiB`
 
-### New intance
-
-#### Decimal prefix 
+### New instance
 
 ```go
 g := New()
 fmt.Println(g.Format(13231323))
 ```
-
-`13.23 MB`
-
-#### Binary prefix
-
-```go
-g := New()
-g.SetBinaryPrefix(true)
-fmt.Println(g.Format(13231323))
-```
-
-`12.62 MiB`

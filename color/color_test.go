@@ -46,7 +46,7 @@ func TestMixMatch(t *testing.T) {
 	fmt.Println("*** mix and match ***")
 	fmt.Println(Green("bold green with white background", B, WhtBg))
 	fmt.Println(Red("underline red", U))
-	fmt.Println(Yellow("dim yellow", D))
+	fmt.Println(Yellow("dim yellow", Dm))
 	fmt.Println(Cyan("inverse cyan", In))
-	fmt.Println(Blue("bold underline dim blue", B, U, D))
+	fmt.Println(Blue("bold underline dim blue", B, U, Dm))
 }

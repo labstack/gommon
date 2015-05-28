@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	global = New()
+	global       = New()
 )
 
 type (
@@ -49,7 +49,6 @@ func (g *Gytes) Format(b uint64) string {
 	}
 }
 
-// SetBinaryPrefix wraps default instance's BinaryPrefix function.
 func BinaryPrefix(on bool) {
 	global.SetBinaryPrefix(on)
 }
