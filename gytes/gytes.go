@@ -16,6 +16,7 @@ type (
 	}
 )
 
+// New creates a Gytes instance.
 func New() *Gytes {
 	return &Gytes{}
 }

@@ -65,9 +65,9 @@ fmt.Println(color.Strikeout("strikeout"))
 ```go
 fmt.Println(color.Green("bold green with white background", color.B, color.WhtBg))
 fmt.Println(color.Red("underline red", color.U))
-fmt.Println(color.Yellow("dim yellow", color.Dm))
+fmt.Println(color.Yellow("dim yellow", color.D))
 fmt.Println(color.Cyan("inverse cyan", color.In))
-fmt.Println(color.Blue("bold underline dim blue", color.B, color.U, color.Dm))
+fmt.Println(color.Blue("bold underline dim blue", color.B, color.U, color.D))
 ```
 ![Mix and match](http://i.imgur.com/jWGq9Ca.png)
 

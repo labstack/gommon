@@ -47,26 +47,53 @@ const (
 	// WhtBg white background style
 	WhtBg = "47"
 
-	// Rst reset emphasis style
-	Rst = "0"
+	// R reset emphasis style
+	R = "0"
 	// B bold emphasis style
 	B = "1"
-	// Dm dim emphasis style
-	Dm = "2"
+	// D dim emphasis style
+	D = "2"
 	// I italic emphasis style
 	I = "3"
 	// U underline emphasis style
 	U = "4"
 	// In inverse emphasis style
 	In = "7"
-	// Hd hidden emphasis style
-	Hd = "8"
-	// So strikeout emphasis style
-	So = "9"
+	// H hidden emphasis style
+	H = "8"
+	// S strikeout emphasis style
+	S = "9"
 )
 
-// Color functions
 var (
+	black   = outer(Blk)
+	red     = outer(Rd)
+	green   = outer(Grn)
+	yellow  = outer(Yel)
+	blue    = outer(Blu)
+	magenta = outer(Mgn)
+	cyan    = outer(Cyn)
+	white   = outer(Wht)
+	grey    = outer(Gry)
+
+	blackBg   = outer(BlkBg)
+	redBg     = outer(RdBg)
+	greenBg   = outer(GrnBg)
+	yellowBg  = outer(YelBg)
+	blueBg    = outer(BluBg)
+	magentaBg = outer(MgnBg)
+	cyanBg    = outer(CynBg)
+	whiteBg   = outer(WhtBg)
+
+	reset     = outer(R)
+	bolt      = outer(B)
+	dim       = outer(D)
+	italic    = outer(I)
+	underline = outer(U)
+	inverse   = outer(In)
+	hidden    = outer(H)
+	strikeout = outer(S)
+
 	global = New()
 )
 
@@ -90,108 +117,109 @@ type (
 	}
 )
 
+// New creates a Color instance.
 func New() *Color {
 	return &Color{}
 }
 
 func (c *Color) Black(msg interface{}, styles ...string) string {
-	return outer(Blk)(msg, styles)
+	return black(msg, styles)
 }
 
 func (c *Color) Red(msg interface{}, styles ...string) string {
-	return outer(Rd)(msg, styles)
+	return red(msg, styles)
 }
 
 func (c *Color) Green(msg interface{}, styles ...string) string {
-	return outer(Grn)(msg, styles)
+	return green(msg, styles)
 }
 
 func (c *Color) Yellow(msg interface{}, styles ...string) string {
-	return outer(Yel)(msg, styles)
+	return yellow(msg, styles)
 }
 
 func (c *Color) Blue(msg interface{}, styles ...string) string {
-	return outer(Blu)(msg, styles)
+	return blue(msg, styles)
 }
 
 func (c *Color) Magenta(msg interface{}, styles ...string) string {
-	return outer(Mgn)(msg, styles)
+	return magenta(msg, styles)
 }
 
 func (c *Color) Cyan(msg interface{}, styles ...string) string {
-	return outer(Cyn)(msg, styles)
+	return cyan(msg, styles)
 }
 
 func (c *Color) White(msg interface{}, styles ...string) string {
-	return outer(Wht)(msg, styles)
+	return white(msg, styles)
 }
 
 func (c *Color) Grey(msg interface{}, styles ...string) string {
-	return outer(Gry)(msg, styles)
+	return grey(msg, styles)
 }
 
 func (c *Color) BlackBg(msg interface{}, styles ...string) string {
-	return outer(BlkBg)(msg, styles)
+	return blackBg(msg, styles)
 }
 
 func (c *Color) RedBg(msg interface{}, styles ...string) string {
-	return outer(RdBg)(msg, styles)
+	return redBg(msg, styles)
 }
 
 func (c *Color) GreenBg(msg interface{}, styles ...string) string {
-	return outer(GrnBg)(msg, styles)
+	return greenBg(msg, styles)
 }
 
 func (c *Color) YellowBg(msg interface{}, styles ...string) string {
-	return outer(YelBg)(msg, styles)
+	return yellowBg(msg, styles)
 }
 
 func (c *Color) BlueBg(msg interface{}, styles ...string) string {
-	return outer(BluBg)(msg, styles)
+	return blueBg(msg, styles)
 }
 
 func (c *Color) MagentaBg(msg interface{}, styles ...string) string {
-	return outer(MgnBg)(msg, styles)
+	return magentaBg(msg, styles)
 }
 
 func (c *Color) CyanBg(msg interface{}, styles ...string) string {
-	return outer(CynBg)(msg, styles)
+	return cyanBg(msg, styles)
 }
 
 func (c *Color) WhiteBg(msg interface{}, styles ...string) string {
-	return outer(WhtBg)(msg, styles)
+	return whiteBg(msg, styles)
 }
 
 func (c *Color) Reset(msg interface{}, styles ...string) string {
-	return outer(Rst)(msg, styles)
+	return reset(msg, styles)
 }
 
 func (c *Color) Bold(msg interface{}, styles ...string) string {
-	return outer(B)(msg, styles)
+	return bolt(msg, styles)
 }
 
 func (c *Color) Dim(msg interface{}, styles ...string) string {
-	return outer(Dm)(msg, styles)
+	return dim(msg, styles)
 }
 
 func (c *Color) Italic(msg interface{}, styles ...string) string {
-	return outer(I)(msg, styles)
+	return italic(msg, styles)
 }
 
 func (c *Color) Underline(msg interface{}, styles ...string) string {
-	return outer(U)(msg, styles)
+	return underline(msg, styles)
 }
 
 func (c *Color) Inverse(msg interface{}, styles ...string) string {
-	return outer(In)(msg, styles)
+	return inverse(msg, styles)
 }
 
 func (c *Color) Hidden(msg interface{}, styles ...string) string {
-	return outer(Hd)(msg, styles)
+	return hidden(msg, styles)
 }
 
 func (c *Color) Strikeout(msg interface{}, styles ...string) string {
-	return outer(So)(msg, styles)
+	return strikeout(msg, styles)
 }
 
 func Black(msg interface{}, styles ...string) string {
@@ -283,7 +311,7 @@ func Underline(msg interface{}, styles ...string) string {
 }
 
 func Inverse(msg interface{}, styles ...string) string {
-	return global.Underline(msg, styles...)
+	return global.Inverse(msg, styles...)
 }
 
 func Hidden(msg interface{}, styles ...string) string {
