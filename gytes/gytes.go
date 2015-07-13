@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	global       = New()
+	global = New()
 )
 
 type (

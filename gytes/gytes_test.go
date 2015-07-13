@@ -28,4 +28,3 @@ func TestGytes(t *testing.T) {
 		t.Errorf("expected `1.29 KiB`, got %s", b)
 	}
 }
-

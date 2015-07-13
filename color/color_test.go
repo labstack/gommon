@@ -2,6 +2,7 @@ package color
 
 import (
 	"fmt"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -49,4 +50,11 @@ func TestMixMatch(t *testing.T) {
 	fmt.Println(Yellow("dim yellow", D))
 	fmt.Println(Cyan("inverse cyan", In))
 	fmt.Println(Blue("bold underline dim blue", B, U, D))
+}
+
+func TestEnableDisable(t *testing.T) {
+	global.Disable()
+	assert.Equal(t, "red", Red("red"))
+	global.Enable()
+	assert.NotEqual(t, "green", Green("green"))
 }

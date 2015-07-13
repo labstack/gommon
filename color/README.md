@@ -71,6 +71,13 @@ fmt.Println(color.Blue("bold underline dim blue", color.B, color.U, color.D))
 ```
 ![Mix and match](http://i.imgur.com/jWGq9Ca.png)
 
+### Enable/Disable the package
+
+```go
+color.Disable()
+color.Enable()
+```
+
 ### New instance
 
 ```go
