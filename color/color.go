@@ -101,7 +101,7 @@ func outer(n string) inner {
 	return func(msg interface{}, styles []string, c *Color) string {
 		// TODO: May be drop fmt to boost performance
 		if c.disabled {
-			return fmt.Sprintf("%s", msg)
+			return fmt.Sprintf("%v", msg)
 		}
 
 		b := new(bytes.Buffer)
@@ -127,12 +127,12 @@ func New() *Color {
 	return &Color{}
 }
 
-// Disable disables the package.
+// Disable disables the colors and styles.
 func (c *Color) Disable() {
 	c.disabled = true
 }
 
-// Enable enables the package.
+// Enable enables the colors and styles.
 func (c *Color) Enable() {
 	c.disabled = false
 }
@@ -235,6 +235,14 @@ func (c *Color) Hidden(msg interface{}, styles ...string) string {
 
 func (c *Color) Strikeout(msg interface{}, styles ...string) string {
 	return strikeout(msg, styles, c)
+}
+
+func Disable() {
+	global.disabled = true
+}
+
+func Enable() {
+	global.disabled = false
 }
 
 func Black(msg interface{}, styles ...string) string {
