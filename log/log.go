@@ -1,10 +1,13 @@
 package log
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"os"
 	"sync"
+
+	"github.com/labstack/gommon/color"
 )
 
 type (
@@ -32,13 +35,13 @@ const (
 
 var (
 	levels = []string{
-		"trace",
-		"debug",
-		"info",
-		"notice",
-		"warn",
-		"error",
-		"fatal",
+		color.Cyan("TRACE"),
+		color.Blue("DEBUG"),
+		color.Green("INFO"),
+		color.Magenta("NOTICE"),
+		color.Yellow("WARN"),
+		color.Red("ERROR"),
+		color.RedBg("FATAL"),
 	}
 )
 
@@ -61,7 +64,9 @@ func (l *Log) SetOutput(w io.Writer) {
 
 	switch w.(type) {
 	case *os.File:
+	case *bytes.Buffer:
 		l.lock = true
+		color.Disable()
 	default:
 		l.lock = false
 	}
