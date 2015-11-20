@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"runtime"
 	"sync"
 
 	"github.com/labstack/gommon/color"
@@ -17,7 +18,8 @@ type (
 		err    io.Writer
 		prefix string
 		sync.Mutex
-		lock bool
+		color color.Color
+		lock  bool
 	}
 	Level uint8
 )
@@ -45,13 +47,18 @@ var (
 	}
 )
 
-func New(prefix string) *Log {
-	return &Log{
+func New(prefix string) (l *Log) {
+	l = &Log{
 		level:  Debug,
 		out:    os.Stdout,
 		err:    os.Stderr,
 		prefix: prefix,
 	}
+	if runtime.GOOS == "windows" {
+		l.lock = true
+		color.Disable()
+	}
+	return
 }
 
 func (l *Log) SetLevel(v Level) {
@@ -106,6 +113,6 @@ func (l *Log) log(v Level, w io.Writer, i interface{}) {
 		defer l.Unlock()
 	}
 	if v >= l.level {
-		fmt.Fprintf(w, "%s|%v\n", levels[v], i)
+		fmt.Fprintf(w, "%s|%s|%v\n", levels[v], l.prefix, i)
 	}
 }
