@@ -1,41 +1,41 @@
 package log
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 	"os"
-	"runtime"
 	"sync"
 
 	"github.com/labstack/gommon/color"
+	"github.com/mattn/go-colorable"
+	"github.com/mattn/go-isatty"
 )
 
 type (
-	Log struct {
+	Logger struct {
 		level  Level
 		out    io.Writer
 		err    io.Writer
 		prefix string
 		sync.Mutex
-		color color.Color
-		lock  bool
+		// lock bool
 	}
 	Level uint8
 )
 
 const (
-	Trace = iota
-	Debug
-	Info
-	Notice
-	Warn
-	Error
-	Fatal
-	Off = 10
+	trace = iota
+	debug
+	info
+	notice
+	warn
+	err
+	fatal
+	off = 10
 )
 
 var (
+	global = New("-")
 	levels = []string{
 		color.Cyan("TRACE"),
 		color.Blue("DEBUG"),
@@ -47,72 +47,121 @@ var (
 	}
 )
 
-func New(prefix string) (l *Log) {
-	l = &Log{
-		level:  Debug,
-		out:    os.Stdout,
-		err:    os.Stderr,
+func New(prefix string) (l *Logger) {
+	l = &Logger{
+		level:  info,
+		out:    colorable.NewColorableStdout(),
+		err:    colorable.NewColorableStderr(),
 		prefix: prefix,
 	}
-	if runtime.GOOS == "windows" {
-		l.lock = true
-		color.Disable()
+
+	if isatty.IsTerminal(os.Stdout.Fd()) {
+		color.Enable()
 	}
+
 	return
 }
 
-func (l *Log) SetLevel(v Level) {
+func (l *Logger) SetPrefix(p string) {
+	l.prefix = p
+}
+
+func (l *Logger) SetLevel(v Level) {
 	l.level = v
 }
 
-func (l *Log) SetOutput(w io.Writer) {
+func (l *Logger) SetOutput(w io.Writer) {
 	l.out = w
 	l.err = w
 
-	switch w.(type) {
+	switch w := w.(type) {
 	case *os.File:
-	case *bytes.Buffer:
-		l.lock = true
-		color.Disable()
-	default:
-		l.lock = false
+		if isatty.IsTerminal(w.Fd()) {
+			color.Enable()
+		}
 	}
 }
 
-func (l *Log) Trace(i interface{}) {
-	l.log(Trace, l.out, i)
+func (l *Logger) Trace(msg interface{}, args ...interface{}) {
+	l.log(trace, l.out, msg, args...)
 }
 
-func (l *Log) Debug(i interface{}) {
-	l.log(Debug, l.out, i)
+func (l *Logger) Debug(msg interface{}, args ...interface{}) {
+	l.log(debug, l.out, msg, args...)
 }
 
-func (l *Log) Info(i interface{}) {
-	l.log(Info, l.out, i)
+func (l *Logger) Info(msg interface{}, args ...interface{}) {
+	l.log(info, l.out, msg, args...)
 }
 
-func (l *Log) Notice(i interface{}) {
-	l.log(Notice, l.out, i)
+func (l *Logger) Notice(msg interface{}, args ...interface{}) {
+	l.log(notice, l.out, msg, args...)
 }
 
-func (l *Log) Warn(i interface{}) {
-	l.log(Warn, l.out, i)
+func (l *Logger) Warn(msg interface{}, args ...interface{}) {
+	l.log(warn, l.out, msg, args...)
 }
 
-func (l *Log) Error(i interface{}) {
-	l.log(Error, l.err, i)
+func (l *Logger) Error(msg interface{}, args ...interface{}) {
+	l.log(err, l.err, msg, args...)
 }
 
-func (l *Log) Fatal(i interface{}) {
-	l.log(Fatal, l.err, i)
+func (l *Logger) Fatal(msg interface{}, args ...interface{}) {
+	l.log(fatal, l.err, msg, args...)
 }
 
-func (l *Log) log(v Level, w io.Writer, i interface{}) {
-	if l.lock {
-		l.Lock()
-		defer l.Unlock()
-	}
+func SetPrefix(p string) {
+	global.SetPrefix(p)
+}
+
+func SetLevel(v Level) {
+	global.SetLevel(v)
+}
+
+func SetOutput(w io.Writer) {
+	global.SetOutput(w)
+}
+
+func Trace(msg interface{}, args ...interface{}) {
+	global.Trace(msg, args...)
+}
+
+func Debug(msg interface{}, args ...interface{}) {
+	global.Debug(msg, args...)
+}
+
+func Info(msg interface{}, args ...interface{}) {
+	global.Info(msg, args...)
+}
+
+func Notice(msg interface{}, args ...interface{}) {
+	global.Notice(msg, args...)
+}
+
+func Warn(msg interface{}, args ...interface{}) {
+	global.Warn(msg, args...)
+}
+
+func Error(msg interface{}, args ...interface{}) {
+	global.Error(msg, args...)
+}
+
+func Fatal(msg interface{}, args ...interface{}) {
+	global.Fatal(msg, args...)
+}
+
+func (l *Logger) log(v Level, w io.Writer, msg interface{}, args ...interface{}) {
+	// if l.lock {
+	l.Lock()
+	defer l.Unlock()
+	// }
 	if v >= l.level {
-		fmt.Fprintf(w, "%s|%s|%v\n", levels[v], l.prefix, i)
+		// TODO: Improve performance
+		f := fmt.Sprintf("%s|%s|%s\n", levels[v], l.prefix, msg)
+		fmt.Fprintf(w, f, args...)
 	}
+}
+
+func init() {
+	color.Disable()
 }

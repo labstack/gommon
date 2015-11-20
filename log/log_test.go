@@ -3,8 +3,15 @@ package log
 import "testing"
 
 func TestLog(t *testing.T) {
-	l := New("log")
-	l.SetLevel(Trace)
+	l := New("test")
+	test(l, trace, t)
+	test(global, trace, t)
+	test(l, notice, t)
+	test(global, notice, t)
+}
+
+func test(l *Logger, v Level, t *testing.T) {
+	l.SetLevel(trace)
 	l.Trace("trace")
 	l.Debug("debug")
 	l.Info("info")

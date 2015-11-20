@@ -35,26 +35,27 @@ func (g *Gytes) Format(b uint64) string {
 	}
 	if b < unit {
 		return strconv.FormatUint(b, 10) + " B"
-	} else {
-		b := float64(b)
-		unit := float64(unit)
-		x := math.Floor(math.Log(b) / math.Log(unit))
-		pre := make([]byte, 1, 2)
-		pre[0] = "KMGTPE"[uint8(x)-1]
-		if g.iec {
-			pre = pre[:2]
-			pre[1] = 'i'
-		}
-		// TODO: Improve performance?
-		return fmt.Sprintf("%.02f %sB", b/math.Pow(unit, x), pre)
 	}
+	bb := float64(b)
+	uu := float64(unit)
+	x := math.Floor(math.Log(bb) / math.Log(uu))
+	pre := make([]byte, 1, 2)
+	pre[0] = "KMGTPE"[uint8(x)-1]
+	if g.iec {
+		pre = pre[:2]
+		pre[1] = 'i'
+	}
+	// TODO: Improve performance?
+	return fmt.Sprintf("%.02f %sB", bb/math.Pow(uu, x), pre)
+
 }
 
+// BinaryPrefix wraps global Gytes's BinaryPrefix function.
 func BinaryPrefix(on bool) {
 	global.SetBinaryPrefix(on)
 }
 
-// Format wraps default instance's Format function.
+// Format wraps global Gytes's Format function.
 func Format(b uint64) string {
 	return global.Format(b)
 }
