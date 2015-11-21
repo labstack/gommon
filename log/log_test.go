@@ -4,14 +4,14 @@ import "testing"
 
 func TestLog(t *testing.T) {
 	l := New("test")
-	test(l, trace, t)
-	test(global, trace, t)
-	test(l, notice, t)
-	test(global, notice, t)
+	test(l, TRACE, t)
+	test(global, TRACE, t)
+	test(l, NOTICE, t)
+	test(global, NOTICE, t)
 }
 
-func test(l *Logger, v Level, t *testing.T) {
-	l.SetLevel(trace)
+func test(l *Logger, v level, t *testing.T) {
+	l.SetLevel(TRACE)
 	l.Trace("trace")
 	l.Debug("debug")
 	l.Info("info")

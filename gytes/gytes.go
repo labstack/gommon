@@ -37,8 +37,8 @@ func (g *Gytes) Format(b uint64) string {
 		return strconv.FormatUint(b, 10) + " B"
 	}
 	bb := float64(b)
-	uu := float64(unit)
-	x := math.Floor(math.Log(bb) / math.Log(uu))
+	uunit := float64(unit)
+	x := math.Floor(math.Log(bb) / math.Log(uunit))
 	pre := make([]byte, 1, 2)
 	pre[0] = "KMGTPE"[uint8(x)-1]
 	if g.iec {
@@ -46,7 +46,7 @@ func (g *Gytes) Format(b uint64) string {
 		pre[1] = 'i'
 	}
 	// TODO: Improve performance?
-	return fmt.Sprintf("%.02f %sB", bb/math.Pow(uu, x), pre)
+	return fmt.Sprintf("%.02f %sB", bb/math.Pow(uunit, x), pre)
 
 }
 

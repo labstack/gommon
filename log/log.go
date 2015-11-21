@@ -18,47 +18,33 @@ type (
 		err    io.Writer
 		prefix string
 		sync.Mutex
-		// lock bool
 	}
 	Level uint8
 )
 
 const (
-	trace = iota
-	debug
-	info
-	notice
-	warn
-	err
-	fatal
-	off = 10
+	TRACE = iota
+	DEBUG
+	INFO
+	NOTICE
+	WARN
+	ERROR
+	FATAL
+	OFF = 10
 )
 
 var (
 	global = New("-")
-	levels = []string{
-		color.Cyan("TRACE"),
-		color.Blue("DEBUG"),
-		color.Green("INFO"),
-		color.Magenta("NOTICE"),
-		color.Yellow("WARN"),
-		color.Red("ERROR"),
-		color.RedBg("FATAL"),
-	}
+	levels []string
 )
 
 func New(prefix string) (l *Logger) {
 	l = &Logger{
-		level:  info,
-		out:    colorable.NewColorableStdout(),
-		err:    colorable.NewColorableStderr(),
+		level:  INFO,
 		prefix: prefix,
 	}
-
-	if isatty.IsTerminal(os.Stdout.Fd()) {
-		color.Enable()
-	}
-
+	l.SetOutput(colorable.NewColorableStdout())
+	l.err = colorable.NewColorableStderr()
 	return
 }
 
@@ -73,41 +59,51 @@ func (l *Logger) SetLevel(v Level) {
 func (l *Logger) SetOutput(w io.Writer) {
 	l.out = w
 	l.err = w
+	color.Disable()
 
 	switch w := w.(type) {
 	case *os.File:
 		if isatty.IsTerminal(w.Fd()) {
 			color.Enable()
 		}
+		levels = []string{
+			color.Cyan("TRACE"),
+			color.Blue("DEBUG"),
+			color.Green("INFO"),
+			color.Magenta("NOTICE"),
+			color.Yellow("WARN"),
+			color.Red("ERROR"),
+			color.RedBg("FATAL"),
+		}
 	}
 }
 
 func (l *Logger) Trace(msg interface{}, args ...interface{}) {
-	l.log(trace, l.out, msg, args...)
+	l.log(TRACE, l.out, msg, args...)
 }
 
 func (l *Logger) Debug(msg interface{}, args ...interface{}) {
-	l.log(debug, l.out, msg, args...)
+	l.log(DEBUG, l.out, msg, args...)
 }
 
 func (l *Logger) Info(msg interface{}, args ...interface{}) {
-	l.log(info, l.out, msg, args...)
+	l.log(INFO, l.out, msg, args...)
 }
 
 func (l *Logger) Notice(msg interface{}, args ...interface{}) {
-	l.log(notice, l.out, msg, args...)
+	l.log(NOTICE, l.out, msg, args...)
 }
 
 func (l *Logger) Warn(msg interface{}, args ...interface{}) {
-	l.log(warn, l.out, msg, args...)
+	l.log(WARN, l.out, msg, args...)
 }
 
 func (l *Logger) Error(msg interface{}, args ...interface{}) {
-	l.log(err, l.err, msg, args...)
+	l.log(ERROR, l.err, msg, args...)
 }
 
 func (l *Logger) Fatal(msg interface{}, args ...interface{}) {
-	l.log(fatal, l.err, msg, args...)
+	l.log(FATAL, l.err, msg, args...)
 }
 
 func SetPrefix(p string) {
@@ -160,8 +156,4 @@ func (l *Logger) log(v Level, w io.Writer, msg interface{}, args ...interface{})
 		f := fmt.Sprintf("%s|%s|%s\n", levels[v], l.prefix, msg)
 		fmt.Fprintf(w, f, args...)
 	}
-}
-
-func init() {
-	color.Disable()
 }
