@@ -151,7 +151,7 @@ func (l *Logger) log(v Level, w io.Writer, msg interface{}, args ...interface{})
 	l.Lock()
 	defer l.Unlock()
 	// }
-	if v >= l.level {
+	if v >= l.level && int(v) < len(levels) {
 		// TODO: Improve performance
 		f := fmt.Sprintf("%s|%s|%s\n", levels[v], l.prefix, msg)
 		fmt.Fprintf(w, f, args...)
