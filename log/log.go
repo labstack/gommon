@@ -30,7 +30,7 @@ const (
 	WARN
 	ERROR
 	FATAL
-	OFF = 10
+	OFF
 )
 
 var (
@@ -147,11 +147,10 @@ func Fatal(msg interface{}, args ...interface{}) {
 }
 
 func (l *Logger) log(v Level, w io.Writer, msg interface{}, args ...interface{}) {
-	// if l.lock {
 	l.Lock()
 	defer l.Unlock()
-	// }
-	if v >= l.level && int(v) < len(levels) {
+
+	if v >= l.level {
 		// TODO: Improve performance
 		f := fmt.Sprintf("%s|%s|%s\n", levels[v], l.prefix, msg)
 		fmt.Fprintf(w, f, args...)

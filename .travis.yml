@@ -7,5 +7,7 @@ before_install:
     - go get golang.org/x/tools/cmd/cover
 script:
     - go test -coverprofile=color.coverprofile ./color
+    - go test -coverprofile=gytes.coverprofile ./gytes
+    - go test -coverprofile=log.coverprofile ./log
     - $HOME/gopath/bin/gover
     - $HOME/gopath/bin/goveralls -coverprofile=gover.coverprofile -service=travis-ci

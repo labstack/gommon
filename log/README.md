@@ -1,1 +1,5 @@
-# WORK IN PROGRESS!
+## WORK IN PROGRESS
+
+### Usage
+
+`log_test.go`
