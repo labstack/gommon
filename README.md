@@ -3,3 +3,4 @@
 Common packages for Go
 - [Gytes](https://github.com/labstack/gommon/tree/master/gytes) - Format bytes to string.
 - [Color](https://github.com/labstack/gommon/tree/master/color) - Style terminal text.
+- [Log](https://github.com/labstack/gommon/tree/master/log) - Simple logging.
