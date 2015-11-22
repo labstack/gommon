@@ -1,6 +1,11 @@
 package log
 
-import "testing"
+import (
+	"bytes"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
 
 func TestLog(t *testing.T) {
 	l := New("test")
@@ -9,7 +14,7 @@ func TestLog(t *testing.T) {
 	test(l, TRACE, t)
 	assert.Contains(t, b.String(), "trace")
 	assert.Contains(t, b.String(), "fatal")
-	
+
 	b.Reset()
 	SetOutput(b)
 	test(global, NOTICE, t)
