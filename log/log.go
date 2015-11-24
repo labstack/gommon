@@ -42,9 +42,9 @@ func New(prefix string) (l *Logger) {
 	l = &Logger{
 		level:  INFO,
 		prefix: prefix,
+		out:    colorable.NewColorableStdout(),
+		err:    colorable.NewColorableStderr(),
 	}
-	l.SetOutput(colorable.NewColorableStdout())
-	l.err = colorable.NewColorableStderr()
 	return
 }
 
@@ -59,17 +59,18 @@ func (l *Logger) SetLevel(v Level) {
 func (l *Logger) SetOutput(w io.Writer) {
 	l.out = w
 	l.err = w
-	initLevels()
-	color.Disable()
 
 	switch w := w.(type) {
 	case *os.File:
 		if isatty.IsTerminal(w.Fd()) {
 			color.Enable()
 		}
-		// NOTE: Reintialize levels to reflect color enable/disable.
-		initLevels()
+	default:
+		color.Disable()
 	}
+
+	// NOTE: Reintialize levels to reflect color enable/disable call.
+	initLevels()
 }
 
 func (l *Logger) Print(msg interface{}, args ...interface{}) {
@@ -179,4 +180,8 @@ func initLevels() {
 		color.Red("ERROR"),
 		color.RedBg("FATAL"),
 	}
+}
+
+func init() {
+	initLevels()
 }
