@@ -59,6 +59,7 @@ func (l *Logger) SetLevel(v Level) {
 func (l *Logger) SetOutput(w io.Writer) {
 	l.out = w
 	l.err = w
+	initLevels()
 	color.Disable()
 
 	switch w := w.(type) {
@@ -66,15 +67,8 @@ func (l *Logger) SetOutput(w io.Writer) {
 		if isatty.IsTerminal(w.Fd()) {
 			color.Enable()
 		}
-		levels = []string{
-			color.Cyan("TRACE"),
-			color.Blue("DEBUG"),
-			color.Green("INFO"),
-			color.Magenta("NOTICE"),
-			color.Yellow("WARN"),
-			color.Red("ERROR"),
-			color.RedBg("FATAL"),
-		}
+		// NOTE: Reintialize levels to reflect color enable/disable.
+		initLevels()
 	}
 }
 
@@ -172,5 +166,17 @@ func (l *Logger) log(v Level, w io.Writer, msg interface{}, args ...interface{})
 		// TODO: Improve performance
 		f := fmt.Sprintf("%s|%s|%v\n", levels[v], l.prefix, msg)
 		fmt.Fprintf(w, f, args...)
+	}
+}
+
+func initLevels() {
+	levels = []string{
+		color.Cyan("TRACE"),
+		color.Blue("DEBUG"),
+		color.Green("INFO"),
+		color.Magenta("NOTICE"),
+		color.Yellow("WARN"),
+		color.Red("ERROR"),
+		color.RedBg("FATAL"),
 	}
 }
