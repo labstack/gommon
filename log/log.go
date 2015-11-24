@@ -78,6 +78,16 @@ func (l *Logger) SetOutput(w io.Writer) {
 	}
 }
 
+func (l *Logger) Print(msg interface{}, args ...interface{}) {
+	f := fmt.Sprintf("%s", msg)
+	fmt.Fprintf(l.out, f, args...)
+}
+
+func (l *Logger) Println(msg interface{}, args ...interface{}) {
+	f := fmt.Sprintf("%s\n", msg)
+	fmt.Fprintf(l.out, f, args...)
+}
+
 func (l *Logger) Trace(msg interface{}, args ...interface{}) {
 	l.log(TRACE, l.out, msg, args...)
 }
@@ -118,6 +128,14 @@ func SetOutput(w io.Writer) {
 	global.SetOutput(w)
 }
 
+func Print(msg interface{}, args ...interface{}) {
+	global.Print(msg, args...)
+}
+
+func Println(msg interface{}, args ...interface{}) {
+	global.Println(msg, args...)
+}
+
 func Trace(msg interface{}, args ...interface{}) {
 	global.Trace(msg, args...)
 }
@@ -152,7 +170,7 @@ func (l *Logger) log(v Level, w io.Writer, msg interface{}, args ...interface{})
 
 	if v >= l.level {
 		// TODO: Improve performance
-		f := fmt.Sprintf("%s|%s|%s\n", levels[v], l.prefix, msg)
+		f := fmt.Sprintf("%s|%s|%v\n", levels[v], l.prefix, msg)
 		fmt.Fprintf(w, f, args...)
 	}
 }

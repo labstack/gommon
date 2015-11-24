@@ -25,6 +25,8 @@ func TestLog(t *testing.T) {
 
 func test(l *Logger, v Level, t *testing.T) {
 	l.SetLevel(v)
+	l.Print("print")
+	l.Println("println")
 	l.Trace("trace")
 	l.Debug("debug")
 	l.Info("info")
