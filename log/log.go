@@ -17,7 +17,7 @@ type (
 		out    io.Writer
 		err    io.Writer
 		prefix string
-		sync.Mutex
+		mu     sync.Mutex
 	}
 	Level uint8
 )
@@ -160,8 +160,8 @@ func Fatal(msg interface{}, args ...interface{}) {
 }
 
 func (l *Logger) log(v Level, w io.Writer, msg interface{}, args ...interface{}) {
-	l.Lock()
-	defer l.Unlock()
+	l.mu.Lock()
+	defer l.mu.Unlock()
 
 	if v >= l.level {
 		// TODO: Improve performance
