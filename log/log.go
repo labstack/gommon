@@ -56,6 +56,10 @@ func (l *Logger) SetLevel(v Level) {
 	l.level = v
 }
 
+func (l *Logger) Level() Level {
+	return l.level
+}
+
 func (l *Logger) SetOutput(w io.Writer) {
 	l.out = w
 	l.err = w
