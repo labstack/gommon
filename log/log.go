@@ -109,6 +109,7 @@ func (l *Logger) Error(msg interface{}, args ...interface{}) {
 
 func (l *Logger) Fatal(msg interface{}, args ...interface{}) {
 	l.log(FATAL, l.err, msg, args...)
+	os.Exit(1)
 }
 
 func SetPrefix(p string) {
