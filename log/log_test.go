@@ -2,6 +2,7 @@ package log
 
 import (
 	"bytes"
+	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -12,15 +13,27 @@ func TestLog(t *testing.T) {
 	b := new(bytes.Buffer)
 	l.SetOutput(b)
 	test(l, TRACE, t)
-	assert.Contains(t, b.String(), "trace")
-	assert.Contains(t, b.String(), "fatal")
+	assert.Contains(t, b.String(), "\nTRACE|test|trace\n")
+	assert.Contains(t, b.String(), "\nFATAL|test|fatal\n")
 
 	b.Reset()
 	SetOutput(b)
 	test(global, NOTICE, t)
-	assert.NotContains(t, b.String(), "info")
-	assert.Contains(t, b.String(), "notice")
-	assert.Contains(t, b.String(), "fatal")
+	assert.NotContains(t, b.String(), "\nINFO|-|info\n")
+	assert.Contains(t, b.String(), "\nNOTICE|-|notice\n")
+	assert.Contains(t, b.String(), "\nFATAL|-|fatal\n")
+}
+
+func TestLogConcurrent(t *testing.T) {
+	var wg sync.WaitGroup
+	for i := 0; i < 2; i++ {
+		wg.Add(1)
+		go func() {
+			TestLog(t)
+			wg.Done()
+		}()
+	}
+	wg.Wait()
 }
 
 func test(l *Logger, v Level, t *testing.T) {
