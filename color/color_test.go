@@ -2,8 +2,9 @@ package color
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestText(t *testing.T) {
@@ -53,8 +54,8 @@ func TestMixMatch(t *testing.T) {
 }
 
 func TestEnableDisable(t *testing.T) {
-	global.Disable()
+	Disable()
 	assert.Equal(t, "red", Red("red"))
-	global.Enable()
+	Enable()
 	assert.NotEqual(t, "green", Green("green"))
 }

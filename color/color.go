@@ -99,7 +99,7 @@ var (
 
 func outer(n string) inner {
 	return func(msg interface{}, styles []string, c *Color) string {
-		// TODO: May be drop fmt to boost performance
+		// TODO: Drop fmt to boost performance?
 		if c.disabled {
 			return fmt.Sprintf("%v", msg)
 		}
@@ -238,11 +238,11 @@ func (c *Color) Strikeout(msg interface{}, styles ...string) string {
 }
 
 func Disable() {
-	global.disabled = true
+	global.Disable()
 }
 
 func Enable() {
-	global.disabled = false
+	global.Enable()
 }
 
 func Black(msg interface{}, styles ...string) string {

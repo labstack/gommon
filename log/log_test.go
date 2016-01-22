@@ -13,14 +13,14 @@ func TestLog(t *testing.T) {
 	l.SetOutput(b)
 	test(l, TRACE, t)
 	assert.Contains(t, b.String(), "trace")
-	assert.Contains(t, b.String(), "fatal")
+	// assert.Contains(t, b.String(), "fatal")
 
 	b.Reset()
 	SetOutput(b)
 	test(global, NOTICE, t)
 	assert.NotContains(t, b.String(), "info")
 	assert.Contains(t, b.String(), "notice")
-	assert.Contains(t, b.String(), "fatal")
+	// assert.Contains(t, b.String(), "fatal")
 }
 
 func test(l *Logger, v Level, t *testing.T) {
@@ -33,5 +33,5 @@ func test(l *Logger, v Level, t *testing.T) {
 	l.Notice("notice")
 	l.Warn("warn")
 	l.Error("error")
-	l.Fatal("fatal")
+	// l.Fatal("fatal")
 }

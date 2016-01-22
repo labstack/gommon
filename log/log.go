@@ -15,7 +15,6 @@ type (
 	Logger struct {
 		level  Level
 		out    io.Writer
-		err    io.Writer
 		prefix string
 		mu     sync.Mutex
 	}
@@ -42,9 +41,8 @@ func New(prefix string) (l *Logger) {
 	l = &Logger{
 		level:  INFO,
 		prefix: prefix,
-		out:    colorable.NewColorableStdout(),
-		err:    colorable.NewColorableStderr(),
 	}
+	l.SetOutput(colorable.NewColorableStdout())
 	return
 }
 
@@ -62,15 +60,10 @@ func (l *Logger) Level() Level {
 
 func (l *Logger) SetOutput(w io.Writer) {
 	l.out = w
-	l.err = w
+	color.Disable()
 
-	switch w := w.(type) {
-	case *os.File:
-		if isatty.IsTerminal(w.Fd()) {
-			color.Enable()
-		}
-	default:
-		color.Disable()
+	if w, ok := w.(*os.File); ok && isatty.IsTerminal(w.Fd()) {
+		color.Enable()
 	}
 
 	// NOTE: Reintialize levels to reflect color enable/disable call.
@@ -108,11 +101,11 @@ func (l *Logger) Warn(msg interface{}, args ...interface{}) {
 }
 
 func (l *Logger) Error(msg interface{}, args ...interface{}) {
-	l.log(ERROR, l.err, msg, args...)
+	l.log(ERROR, l.out, msg, args...)
 }
 
 func (l *Logger) Fatal(msg interface{}, args ...interface{}) {
-	l.log(FATAL, l.err, msg, args...)
+	l.log(FATAL, l.out, msg, args...)
 	os.Exit(1)
 }
 
