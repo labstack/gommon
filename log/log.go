@@ -22,10 +22,8 @@ type (
 )
 
 const (
-	TRACE = iota
-	DEBUG
+	DEBUG = iota
 	INFO
-	NOTICE
 	WARN
 	ERROR
 	FATAL
@@ -70,42 +68,54 @@ func (l *Logger) SetOutput(w io.Writer) {
 	initLevels()
 }
 
-func (l *Logger) Print(msg interface{}, args ...interface{}) {
-	f := fmt.Sprintf("%s", msg)
+func (l *Logger) Print(i interface{}) {
+	fmt.Println(i)
+}
+
+func (l *Logger) Printf(format string, args ...interface{}) {
+	f := fmt.Sprintf("%s\n", format)
 	fmt.Fprintf(l.out, f, args...)
 }
 
-func (l *Logger) Println(msg interface{}, args ...interface{}) {
-	f := fmt.Sprintf("%s\n", msg)
-	fmt.Fprintf(l.out, f, args...)
+func (l *Logger) Debug(i interface{}) {
+	l.log(DEBUG, i)
 }
 
-func (l *Logger) Trace(msg interface{}, args ...interface{}) {
-	l.log(TRACE, l.out, msg, args...)
+func (l *Logger) Debugf(format string, args ...interface{}) {
+	l.log(DEBUG, format, args...)
 }
 
-func (l *Logger) Debug(msg interface{}, args ...interface{}) {
-	l.log(DEBUG, l.out, msg, args...)
+func (l *Logger) Info(i interface{}) {
+	l.log(INFO, i)
 }
 
-func (l *Logger) Info(msg interface{}, args ...interface{}) {
-	l.log(INFO, l.out, msg, args...)
+func (l *Logger) Infof(format string, args ...interface{}) {
+	l.log(INFO, format, args...)
 }
 
-func (l *Logger) Notice(msg interface{}, args ...interface{}) {
-	l.log(NOTICE, l.out, msg, args...)
+func (l *Logger) Warn(i interface{}) {
+	l.log(WARN, i)
 }
 
-func (l *Logger) Warn(msg interface{}, args ...interface{}) {
-	l.log(WARN, l.out, msg, args...)
+func (l *Logger) Warnf(format string, args ...interface{}) {
+	l.log(WARN, format, args...)
 }
 
-func (l *Logger) Error(msg interface{}, args ...interface{}) {
-	l.log(ERROR, l.out, msg, args...)
+func (l *Logger) Error(i interface{}) {
+	l.log(ERROR, i)
 }
 
-func (l *Logger) Fatal(msg interface{}, args ...interface{}) {
-	l.log(FATAL, l.out, msg, args...)
+func (l *Logger) Errorf(format string, args ...interface{}) {
+	l.log(ERROR, format, args...)
+}
+
+func (l *Logger) Fatal(i interface{}) {
+	l.log(FATAL, i)
+	os.Exit(1)
+}
+
+func (l *Logger) Fatalf(format string, args ...interface{}) {
+	l.log(FATAL, format, args...)
 	os.Exit(1)
 }
 
@@ -121,59 +131,73 @@ func SetOutput(w io.Writer) {
 	global.SetOutput(w)
 }
 
-func Print(msg interface{}, args ...interface{}) {
-	global.Print(msg, args...)
+func Print(i interface{}) {
+	global.Print(i)
 }
 
-func Println(msg interface{}, args ...interface{}) {
-	global.Println(msg, args...)
+func Printf(format string, args ...interface{}) {
+	global.Printf(format, args...)
 }
 
-func Trace(msg interface{}, args ...interface{}) {
-	global.Trace(msg, args...)
+func Debug(i interface{}) {
+	global.Debug(i)
 }
 
-func Debug(msg interface{}, args ...interface{}) {
-	global.Debug(msg, args...)
+func Debugf(format string, args ...interface{}) {
+	global.Debugf(format, args...)
 }
 
-func Info(msg interface{}, args ...interface{}) {
-	global.Info(msg, args...)
+func Info(i interface{}) {
+	global.Info(i)
 }
 
-func Notice(msg interface{}, args ...interface{}) {
-	global.Notice(msg, args...)
+func Infof(format string, args ...interface{}) {
+	global.Infof(format, args...)
 }
 
-func Warn(msg interface{}, args ...interface{}) {
-	global.Warn(msg, args...)
+func Warn(i interface{}) {
+	global.Warn(i)
 }
 
-func Error(msg interface{}, args ...interface{}) {
-	global.Error(msg, args...)
+func Warnf(format string, args ...interface{}) {
+	global.Warnf(format, args...)
 }
 
-func Fatal(msg interface{}, args ...interface{}) {
-	global.Fatal(msg, args...)
+func Error(i interface{}) {
+	global.Error(i)
 }
 
-func (l *Logger) log(v Level, w io.Writer, msg interface{}, args ...interface{}) {
+func Errorf(format string, args ...interface{}) {
+	global.Errorf(format, args...)
+}
+
+func Fatal(i interface{}) {
+	global.Fatal(i)
+}
+
+func Fatalf(format string, args ...interface{}) {
+	global.Fatalf(format, args...)
+}
+
+func (l *Logger) log(v Level, format interface{}, args ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 
 	if v >= l.level {
-		// TODO: Improve performance
-		f := fmt.Sprintf("%s|%s|%v\n", levels[v], l.prefix, msg)
-		fmt.Fprintf(w, f, args...)
+		if len(args) == 0 {
+			fmt.Println(format)
+		} else {
+			// TODO: Improve performance
+			f := fmt.Sprintf("%s|%s|%v\n", levels[v], l.prefix, format)
+			fmt.Fprintf(l.out, f, args...)
+		}
 	}
 }
 
 func initLevels() {
 	levels = []string{
-		color.Cyan("TRACE"),
 		color.Blue("DEBUG"),
 		color.Green("INFO"),
-		color.Magenta("NOTICE"),
 		color.Yellow("WARN"),
 		color.Red("ERROR"),
 		color.RedBg("FATAL"),
