@@ -68,8 +68,8 @@ func (l *Logger) SetOutput(w io.Writer) {
 	initLevels()
 }
 
-func (l *Logger) Print(i interface{}) {
-	fmt.Println(i)
+func (l *Logger) Print(i ...interface{}) {
+	fmt.Println(i...)
 }
 
 func (l *Logger) Printf(format string, args ...interface{}) {
@@ -77,40 +77,40 @@ func (l *Logger) Printf(format string, args ...interface{}) {
 	fmt.Fprintf(l.out, f, args...)
 }
 
-func (l *Logger) Debug(i interface{}) {
-	l.log(DEBUG, i)
+func (l *Logger) Debug(i ...interface{}) {
+	l.log(DEBUG, "", i...)
 }
 
 func (l *Logger) Debugf(format string, args ...interface{}) {
 	l.log(DEBUG, format, args...)
 }
 
-func (l *Logger) Info(i interface{}) {
-	l.log(INFO, i)
+func (l *Logger) Info(i ...interface{}) {
+	l.log(INFO, "", i...)
 }
 
 func (l *Logger) Infof(format string, args ...interface{}) {
 	l.log(INFO, format, args...)
 }
 
-func (l *Logger) Warn(i interface{}) {
-	l.log(WARN, i)
+func (l *Logger) Warn(i ...interface{}) {
+	l.log(WARN, "", i...)
 }
 
 func (l *Logger) Warnf(format string, args ...interface{}) {
 	l.log(WARN, format, args...)
 }
 
-func (l *Logger) Error(i interface{}) {
-	l.log(ERROR, i)
+func (l *Logger) Error(i ...interface{}) {
+	l.log(ERROR, "", i...)
 }
 
 func (l *Logger) Errorf(format string, args ...interface{}) {
 	l.log(ERROR, format, args...)
 }
 
-func (l *Logger) Fatal(i interface{}) {
-	l.log(FATAL, i)
+func (l *Logger) Fatal(i ...interface{}) {
+	l.log(FATAL, "", i...)
 	os.Exit(1)
 }
 
@@ -131,61 +131,61 @@ func SetOutput(w io.Writer) {
 	global.SetOutput(w)
 }
 
-func Print(i interface{}) {
-	global.Print(i)
+func Print(i ...interface{}) {
+	global.Print(i...)
 }
 
 func Printf(format string, args ...interface{}) {
 	global.Printf(format, args...)
 }
 
-func Debug(i interface{}) {
-	global.Debug(i)
+func Debug(i ...interface{}) {
+	global.Debug(i...)
 }
 
 func Debugf(format string, args ...interface{}) {
 	global.Debugf(format, args...)
 }
 
-func Info(i interface{}) {
-	global.Info(i)
+func Info(i ...interface{}) {
+	global.Info(i...)
 }
 
 func Infof(format string, args ...interface{}) {
 	global.Infof(format, args...)
 }
 
-func Warn(i interface{}) {
-	global.Warn(i)
+func Warn(i ...interface{}) {
+	global.Warn(i...)
 }
 
 func Warnf(format string, args ...interface{}) {
 	global.Warnf(format, args...)
 }
 
-func Error(i interface{}) {
-	global.Error(i)
+func Error(i ...interface{}) {
+	global.Error(i...)
 }
 
 func Errorf(format string, args ...interface{}) {
 	global.Errorf(format, args...)
 }
 
-func Fatal(i interface{}) {
-	global.Fatal(i)
+func Fatal(i ...interface{}) {
+	global.Fatal(i...)
 }
 
 func Fatalf(format string, args ...interface{}) {
 	global.Fatalf(format, args...)
 }
 
-func (l *Logger) log(v Level, format interface{}, args ...interface{}) {
+func (l *Logger) log(v Level, format string, args ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 
 	if v >= l.level {
-		if len(args) == 0 {
-			fmt.Println(format)
+		if format == "" {
+			fmt.Println(args...)
 		} else {
 			// TODO: Improve performance
 			f := fmt.Sprintf("%s|%s|%v\n", levels[v], l.prefix, format)

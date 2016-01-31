@@ -5,6 +5,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"os"
+	"os/exec"
 )
 
 func TestLog(t *testing.T) {
@@ -24,6 +26,35 @@ func TestLog(t *testing.T) {
 	assert.NotContains(t, b.String(), "info")
 	assert.Contains(t, b.String(), "warn")
 	// assert.Contains(t, b.String(), "fatal")
+}
+
+func TestFatal(t *testing.T) {
+	l := New("test")
+	switch os.Getenv("TEST_LOGGER_FATAL") {
+	case "fatal":
+		l.Fatal("fatal")
+		return
+	case "fatalf":
+		l.Fatalf("fatal-%s", "f")
+		return
+	}
+
+	loggerFatalTest(t, "fatal", "fatal")
+	loggerFatalTest(t, "fatalf", "fatal-f")
+}
+
+func loggerFatalTest(t *testing.T, env string, contains string) {
+	buf := new(bytes.Buffer)
+	cmd := exec.Command(os.Args[0], "-test.run=TestFatal")
+	cmd.Env = append(os.Environ(), "TEST_LOGGER_FATAL="+env)
+	cmd.Stdout = buf
+	cmd.Stderr = buf
+	err := cmd.Run()
+	if e, ok := err.(*exec.ExitError); ok && !e.Success() {
+		assert.Contains(t, buf.String(), contains)
+		return
+	}
+	t.Fatalf("process ran with err %v, want exit status 1", err)
 }
 
 func test(l *Logger, v Level, t *testing.T) {
