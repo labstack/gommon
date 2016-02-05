@@ -6,9 +6,10 @@ import (
 	"os"
 	"sync"
 
-	"github.com/labstack/gommon/color"
 	"github.com/mattn/go-colorable"
 	"github.com/mattn/go-isatty"
+
+	"github.com/labstack/gommon/color"
 )
 
 type (
@@ -18,6 +19,7 @@ type (
 		prefix string
 		mu     sync.Mutex
 	}
+
 	Level uint8
 )
 
@@ -184,11 +186,12 @@ func (l *Logger) log(v Level, format string, args ...interface{}) {
 	defer l.mu.Unlock()
 
 	if v >= l.level {
-		if format == "" {
-			fmt.Println(args...)
+		if format == "" && len(args) > 0 {
+			args[0] = fmt.Sprintf("%s|%s|%s", levels[v], l.prefix, args[0])
+			fmt.Fprintln(l.out, args...)
 		} else {
 			// TODO: Improve performance
-			f := fmt.Sprintf("%s|%s|%v\n", levels[v], l.prefix, format)
+			f := fmt.Sprintf("%s|%s|%s\n", levels[v], l.prefix, format)
 			fmt.Fprintf(l.out, f, args...)
 		}
 	}

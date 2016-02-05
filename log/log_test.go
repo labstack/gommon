@@ -4,9 +4,10 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"os"
 	"os/exec"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestLog(t *testing.T) {
@@ -18,14 +19,13 @@ func TestLog(t *testing.T) {
 	assert.Contains(t, b.String(), "debugf")
 	assert.Contains(t, b.String(), "warn")
 	assert.Contains(t, b.String(), "warnf")
-	// assert.Contains(t, b.String(), "fatal")
 
 	b.Reset()
 	SetOutput(b)
 	test(global, WARN, t)
 	assert.NotContains(t, b.String(), "info")
 	assert.Contains(t, b.String(), "warn")
-	// assert.Contains(t, b.String(), "fatal")
+	println(b.String())
 }
 
 func TestFatal(t *testing.T) {
@@ -69,5 +69,4 @@ func test(l *Logger, v Level, t *testing.T) {
 	l.Warnf("warn%s", "f")
 	l.Error("error")
 	l.Errorf("error%s", "f")
-	// l.Fatal("fatal")
 }
