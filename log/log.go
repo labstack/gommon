@@ -71,7 +71,7 @@ func (l *Logger) SetOutput(w io.Writer) {
 }
 
 func (l *Logger) Print(i ...interface{}) {
-	fmt.Println(i...)
+	fmt.Fprintln(l.out, i...)
 }
 
 func (l *Logger) Printf(format string, args ...interface{}) {
