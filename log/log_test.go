@@ -10,8 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func test(l *Logger, v Level, t *testing.T) {
-	l.SetLevel(v)
+func test(l *Logger, t *testing.T) {
 	l.Print("print")
 	l.Printf("print%s", "f")
 	l.Debug("debug")
@@ -28,18 +27,29 @@ func TestLog(t *testing.T) {
 	l := New("test")
 	b := new(bytes.Buffer)
 	l.SetOutput(b)
-	test(l, DEBUG, t)
-	assert.Contains(t, b.String(), "\nDEBUG|test|debug\n")
-	assert.Contains(t, b.String(), "\nDEBUG|test|debugf\n")
+	// l.DisableColor()
+	l.SetLevel(INFO)
+	test(l, t)
+	// assert.Contains(t, b.String(), "print\n")
+	assert.Contains(t, b.String(), "printf\n")
+	assert.NotContains(t, b.String(), "debug")
+	assert.NotContains(t, b.String(), "debugf")
 	assert.Contains(t, b.String(), "\nWARN|test|warn\n")
 	assert.Contains(t, b.String(), "\nWARN|test|warnf\n")
+}
 
-	b.Reset()
+func TestGlobal(t *testing.T) {
+	b := new(bytes.Buffer)
 	SetOutput(b)
-	test(global, WARN, t)
-	assert.NotContains(t, b.String(), "info")
+	// DisableColor()
+	SetLevel(INFO)
+	test(global, t)
+	// assert.Contains(t, b.String(), "print\n")
+	assert.Contains(t, b.String(), "printf\n")
+	assert.NotContains(t, b.String(), "debug")
+	assert.NotContains(t, b.String(), "debugf")
 	assert.Contains(t, b.String(), "\nWARN|-|warn\n")
-	println(b.String())
+	assert.Contains(t, b.String(), "\nWARN|-|warnf\n")
 }
 
 func TestLogConcurrent(t *testing.T) {
