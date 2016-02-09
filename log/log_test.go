@@ -27,7 +27,7 @@ func TestLog(t *testing.T) {
 	l := New("test")
 	b := new(bytes.Buffer)
 	l.SetOutput(b)
-	// l.DisableColor()
+	l.DisableColor()
 	l.SetLevel(INFO)
 	test(l, t)
 	assert.Contains(t, b.String(), "print\n")
@@ -41,7 +41,7 @@ func TestLog(t *testing.T) {
 func TestGlobal(t *testing.T) {
 	b := new(bytes.Buffer)
 	SetOutput(b)
-	// DisableColor()
+	DisableColor()
 	SetLevel(INFO)
 	test(global, t)
 	assert.Contains(t, b.String(), "print\n")
