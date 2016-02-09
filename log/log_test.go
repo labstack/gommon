@@ -11,6 +11,11 @@ import (
 )
 
 func test(l *Logger, t *testing.T) {
+	b := new(bytes.Buffer)
+	l.SetOutput(b)
+	l.DisableColor()
+	l.SetLevel(WARN)
+
 	l.Print("print")
 	l.Printf("print%s", "f")
 	l.Debug("debug")
@@ -21,35 +26,26 @@ func test(l *Logger, t *testing.T) {
 	l.Warnf("warn%s", "f")
 	l.Error("error")
 	l.Errorf("error%s", "f")
+
+	assert.Contains(t, b.String(), "print\n")
+	assert.Contains(t, b.String(), "\nprintf\n")
+	assert.NotContains(t, b.String(), "debug")
+	assert.NotContains(t, b.String(), "debugf")
+	assert.NotContains(t, b.String(), "info")
+	assert.NotContains(t, b.String(), "infof")
+	assert.Contains(t, b.String(), "\nWARN|"+l.prefix+"|warn\n")
+	assert.Contains(t, b.String(), "\nWARN|"+l.prefix+"|warnf\n")
+	assert.Contains(t, b.String(), "\nERROR|"+l.prefix+"|error\n")
+	assert.Contains(t, b.String(), "\nERROR|"+l.prefix+"|errorf\n")
 }
 
 func TestLog(t *testing.T) {
 	l := New("test")
-	b := new(bytes.Buffer)
-	l.SetOutput(b)
-	l.DisableColor()
-	l.SetLevel(INFO)
 	test(l, t)
-	assert.Contains(t, b.String(), "print\n")
-	assert.Contains(t, b.String(), "printf\n")
-	assert.NotContains(t, b.String(), "debug")
-	assert.NotContains(t, b.String(), "debugf")
-	assert.Contains(t, b.String(), "\nWARN|test|warn\n")
-	assert.Contains(t, b.String(), "\nWARN|test|warnf\n")
 }
 
 func TestGlobal(t *testing.T) {
-	b := new(bytes.Buffer)
-	SetOutput(b)
-	DisableColor()
-	SetLevel(INFO)
 	test(global, t)
-	assert.Contains(t, b.String(), "print\n")
-	assert.Contains(t, b.String(), "printf\n")
-	assert.NotContains(t, b.String(), "debug")
-	assert.NotContains(t, b.String(), "debugf")
-	assert.Contains(t, b.String(), "\nWARN|-|warn\n")
-	assert.Contains(t, b.String(), "\nWARN|-|warnf\n")
 }
 
 func TestLogConcurrent(t *testing.T) {
