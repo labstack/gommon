@@ -2,30 +2,62 @@ package log
 
 import (
 	"bytes"
-	"testing"
-
 	"os"
 	"os/exec"
+	"sync"
+	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func TestLog(t *testing.T) {
-	l := New("test")
+func test(l *Logger, t *testing.T) {
 	b := new(bytes.Buffer)
 	l.SetOutput(b)
-	test(l, DEBUG, t)
-	assert.Contains(t, b.String(), "debug")
-	assert.Contains(t, b.String(), "debugf")
-	assert.Contains(t, b.String(), "warn")
-	assert.Contains(t, b.String(), "warnf")
+	l.DisableColor()
+	l.SetLevel(WARN)
 
-	b.Reset()
-	SetOutput(b)
-	test(global, WARN, t)
+	l.Print("print")
+	l.Printf("print%s", "f")
+	l.Debug("debug")
+	l.Debugf("debug%s", "f")
+	l.Info("info")
+	l.Infof("info%s", "f")
+	l.Warn("warn")
+	l.Warnf("warn%s", "f")
+	l.Error("error")
+	l.Errorf("error%s", "f")
+
+	assert.Contains(t, b.String(), "print\n")
+	assert.Contains(t, b.String(), "\nprintf\n")
+	assert.NotContains(t, b.String(), "debug")
+	assert.NotContains(t, b.String(), "debugf")
 	assert.NotContains(t, b.String(), "info")
-	assert.Contains(t, b.String(), "warn")
-	println(b.String())
+	assert.NotContains(t, b.String(), "infof")
+	assert.Contains(t, b.String(), "\nWARN|"+l.prefix+"|warn\n")
+	assert.Contains(t, b.String(), "\nWARN|"+l.prefix+"|warnf\n")
+	assert.Contains(t, b.String(), "\nERROR|"+l.prefix+"|error\n")
+	assert.Contains(t, b.String(), "\nERROR|"+l.prefix+"|errorf\n")
+}
+
+func TestLog(t *testing.T) {
+	l := New("test")
+	test(l, t)
+}
+
+func TestGlobal(t *testing.T) {
+	test(global, t)
+}
+
+func TestLogConcurrent(t *testing.T) {
+	var wg sync.WaitGroup
+	for i := 0; i < 2; i++ {
+		wg.Add(1)
+		go func() {
+			TestLog(t)
+			wg.Done()
+		}()
+	}
+	wg.Wait()
 }
 
 func TestFatal(t *testing.T) {
@@ -55,18 +87,4 @@ func loggerFatalTest(t *testing.T, env string, contains string) {
 		return
 	}
 	t.Fatalf("process ran with err %v, want exit status 1", err)
-}
-
-func test(l *Logger, v Level, t *testing.T) {
-	l.SetLevel(v)
-	l.Print("print")
-	l.Printf("print%s", "f")
-	l.Debug("debug")
-	l.Debugf("debug%s", "f")
-	l.Info("info")
-	l.Infof("info%s", "f")
-	l.Warn("warn")
-	l.Warnf("warn%s", "f")
-	l.Error("error")
-	l.Errorf("error%s", "f")
 }

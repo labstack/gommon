@@ -15,6 +15,8 @@ import (
 type (
 	Logger struct {
 		level  Level
+		levels []string
+		color  color.Color
 		out    io.Writer
 		prefix string
 		mu     sync.Mutex
@@ -34,7 +36,6 @@ const (
 
 var (
 	global = New("-")
-	levels []string
 )
 
 func New(prefix string) (l *Logger) {
@@ -44,6 +45,26 @@ func New(prefix string) (l *Logger) {
 	}
 	l.SetOutput(colorable.NewColorableStdout())
 	return
+}
+
+func (l *Logger) initLevels() {
+	l.levels = []string{
+		l.color.Blue("DEBUG"),
+		l.color.Green("INFO"),
+		l.color.Yellow("WARN"),
+		l.color.Red("ERROR"),
+		l.color.RedBg("FATAL"),
+	}
+}
+
+func (l *Logger) DisableColor() {
+	l.color.Disable()
+	l.initLevels()
+}
+
+func (l *Logger) EnableColor() {
+	l.color.Enable()
+	l.initLevels()
 }
 
 func (l *Logger) SetPrefix(p string) {
@@ -60,18 +81,15 @@ func (l *Logger) Level() Level {
 
 func (l *Logger) SetOutput(w io.Writer) {
 	l.out = w
-	color.Disable()
+	l.DisableColor()
 
 	if w, ok := w.(*os.File); ok && isatty.IsTerminal(w.Fd()) {
-		color.Enable()
+		l.EnableColor()
 	}
-
-	// NOTE: Reintialize levels to reflect color enable/disable call.
-	initLevels()
 }
 
 func (l *Logger) Print(i ...interface{}) {
-	fmt.Println(i...)
+	fmt.Fprintln(l.out, i...)
 }
 
 func (l *Logger) Printf(format string, args ...interface{}) {
@@ -119,6 +137,14 @@ func (l *Logger) Fatal(i ...interface{}) {
 func (l *Logger) Fatalf(format string, args ...interface{}) {
 	l.log(FATAL, format, args...)
 	os.Exit(1)
+}
+
+func DisableColor() {
+	global.DisableColor()
+}
+
+func EnableColor() {
+	global.EnableColor()
 }
 
 func SetPrefix(p string) {
@@ -187,26 +213,12 @@ func (l *Logger) log(v Level, format string, args ...interface{}) {
 
 	if v >= l.level {
 		if format == "" && len(args) > 0 {
-			args[0] = fmt.Sprintf("%s|%s|%s", levels[v], l.prefix, args[0])
+			args[0] = fmt.Sprintf("%s|%s|%s", l.levels[v], l.prefix, args[0])
 			fmt.Fprintln(l.out, args...)
 		} else {
 			// TODO: Improve performance
-			f := fmt.Sprintf("%s|%s|%s\n", levels[v], l.prefix, format)
+			f := fmt.Sprintf("%s|%s|%s\n", l.levels[v], l.prefix, format)
 			fmt.Fprintf(l.out, f, args...)
 		}
 	}
-}
-
-func initLevels() {
-	levels = []string{
-		color.Blue("DEBUG"),
-		color.Green("INFO"),
-		color.Yellow("WARN"),
-		color.Red("ERROR"),
-		color.RedBg("FATAL"),
-	}
-}
-
-func init() {
-	initLevels()
 }
