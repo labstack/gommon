@@ -1,4 +1,4 @@
-package gytes
+package bytes
 
 import (
 	"fmt"
@@ -11,24 +11,24 @@ var (
 )
 
 type (
-	Gytes struct {
+	Bytes struct {
 		iec bool
 	}
 )
 
-// New creates a Gytes instance.
-func New() *Gytes {
-	return &Gytes{}
+// New creates a Bytes instance.
+func New() *Bytes {
+	return &Bytes{}
 }
 
 // SetBinaryPrefix sets binary prefix format.
-func (g *Gytes) SetBinaryPrefix(on bool) {
+func (g *Bytes) SetBinaryPrefix(on bool) {
 	g.iec = on
 }
 
 // Format formats bytes to string. For example, 1323 bytes will return 1.32 KB.
 // If binary prefix is set, it will return 1.29 KiB.
-func (g *Gytes) Format(b uint64) string {
+func (g *Bytes) Format(b uint64) string {
 	unit := uint64(1000)
 	if g.iec {
 		unit = 1024
@@ -50,12 +50,12 @@ func (g *Gytes) Format(b uint64) string {
 
 }
 
-// BinaryPrefix wraps global Gytes's BinaryPrefix function.
+// BinaryPrefix wraps global Bytes's BinaryPrefix function.
 func BinaryPrefix(on bool) {
 	global.SetBinaryPrefix(on)
 }
 
-// Format wraps global Gytes's Format function.
+// Format wraps global Bytes's Format function.
 func Format(b uint64) string {
 	return global.Format(b)
 }

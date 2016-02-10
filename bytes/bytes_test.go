@@ -1,8 +1,8 @@
-package gytes
+package bytes
 
 import "testing"
 
-func TestGytes(t *testing.T) {
+func TestBytes(t *testing.T) {
 	// B
 	b := Format(515)
 	if b != "515 B" {

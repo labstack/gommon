@@ -9,7 +9,7 @@ before_install:
 script:
     - go test -race ./...
     - go test -coverprofile=color.coverprofile ./color
-    - go test -coverprofile=gytes.coverprofile ./gytes
+    - go test -coverprofile=bytes.coverprofile ./bytes
     - go test -coverprofile=log.coverprofile ./log
     - $HOME/gopath/bin/gover
     - $HOME/gopath/bin/goveralls -coverprofile=gover.coverprofile -service=travis-ci
