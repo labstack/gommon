@@ -213,7 +213,7 @@ func (l *Logger) log(v Level, format string, args ...interface{}) {
 
 	if v >= l.level {
 		if format == "" && len(args) > 0 {
-			args[0] = fmt.Sprintf("%s|%s|%s", l.levels[v], l.prefix, args[0])
+			args[0] = fmt.Sprintf("%s|%s|%v", l.levels[v], l.prefix, args[0])
 			fmt.Fprintln(l.out, args...)
 		} else {
 			// TODO: Improve performance
