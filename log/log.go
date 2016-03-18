@@ -5,21 +5,24 @@ import (
 	"io"
 	"os"
 	"sync"
+	"time"
 
 	"github.com/mattn/go-colorable"
 	"github.com/mattn/go-isatty"
+	"github.com/valyala/fasttemplate"
 
 	"github.com/labstack/gommon/color"
 )
 
 type (
 	Logger struct {
-		level  Level
-		levels []string
-		color  color.Color
-		out    io.Writer
-		prefix string
-		mu     sync.Mutex
+		prefix   string
+		level    Level
+		template *fasttemplate.Template
+		out      io.Writer
+		levels   []string
+		color    color.Color
+		mu       sync.Mutex
 	}
 
 	Level uint8
@@ -35,13 +38,15 @@ const (
 )
 
 var (
-	global = New("-")
+	global        = New("-")
+	defaultFormat = "${time}|${level}|${prefix}|${message}\n"
 )
 
 func New(prefix string) (l *Logger) {
 	l = &Logger{
-		level:  INFO,
-		prefix: prefix,
+		level:    INFO,
+		prefix:   prefix,
+		template: l.newTemplate(defaultFormat),
 	}
 	l.SetOutput(colorable.NewColorableStdout())
 	return
@@ -55,6 +60,10 @@ func (l *Logger) initLevels() {
 		l.color.Red("ERROR"),
 		l.color.RedBg("FATAL"),
 	}
+}
+
+func (l *Logger) newTemplate(format string) *fasttemplate.Template {
+	return fasttemplate.New(format, "${", "}")
 }
 
 func (l *Logger) DisableColor() {
@@ -77,6 +86,10 @@ func (l *Logger) SetLevel(v Level) {
 
 func (l *Logger) Level() Level {
 	return l.level
+}
+
+func (l *Logger) SetFormat(format string) {
+	l.template = l.newTemplate(format)
 }
 
 func (l *Logger) SetOutput(w io.Writer) {
@@ -212,13 +225,27 @@ func (l *Logger) log(v Level, format string, args ...interface{}) {
 	defer l.mu.Unlock()
 
 	if v >= l.level {
-		if format == "" && len(args) > 0 {
-			args[0] = fmt.Sprintf("%s|%s|%v", l.levels[v], l.prefix, args[0])
-			fmt.Fprintln(l.out, args...)
+		message := ""
+
+		if format == "" {
+			message = fmt.Sprint(args...)
 		} else {
-			// TODO: Improve performance
-			f := fmt.Sprintf("%s|%s|%s\n", l.levels[v], l.prefix, format)
-			fmt.Fprintf(l.out, f, args...)
+			message = fmt.Sprintf(format, args...)
 		}
+
+		l.template.ExecuteFunc(l.out, func(w io.Writer, tag string) (int, error) {
+			switch tag {
+			case "time":
+				return w.Write([]byte(time.Now().Format(time.Stamp)))
+			case "level":
+				return w.Write([]byte(l.levels[v]))
+			case "prefix":
+				return w.Write([]byte(l.prefix))
+			case "message":
+				return w.Write([]byte(message))
+			default:
+				return w.Write([]byte(fmt.Sprintf("[unknown tag %s]", tag)))
+			}
+		})
 	}
 }
