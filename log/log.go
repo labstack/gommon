@@ -17,15 +17,13 @@ import (
 type (
 	Logger struct {
 		prefix   string
-		level    Level
+		level    uint8
+		output   io.Writer
 		template *fasttemplate.Template
-		out      io.Writer
 		levels   []string
 		color    color.Color
-		mu       sync.Mutex
+		mutex    sync.Mutex
 	}
-
-	Level uint8
 )
 
 const (
@@ -39,7 +37,7 @@ const (
 
 var (
 	global        = New("-")
-	defaultFormat = "${time}|${level}|${prefix}|${message}\n"
+	defaultFormat = "${time} | ${level} | ${prefix} | ${message}\n"
 )
 
 func New(prefix string) (l *Logger) {
@@ -76,24 +74,32 @@ func (l *Logger) EnableColor() {
 	l.initLevels()
 }
 
+func (l *Logger) Prefix() string {
+	return l.prefix
+}
+
 func (l *Logger) SetPrefix(p string) {
 	l.prefix = p
 }
 
-func (l *Logger) SetLevel(v Level) {
-	l.level = v
-}
-
-func (l *Logger) Level() Level {
+func (l *Logger) Level() uint8 {
 	return l.level
 }
 
-func (l *Logger) SetFormat(format string) {
-	l.template = l.newTemplate(format)
+func (l *Logger) SetLevel(v uint8) {
+	l.level = v
+}
+
+func (l *Logger) Output() io.Writer {
+	return l.output
+}
+
+func (l *Logger) SetFormat(f string) {
+	l.template = l.newTemplate(f)
 }
 
 func (l *Logger) SetOutput(w io.Writer) {
-	l.out = w
+	l.output = w
 	l.DisableColor()
 
 	if w, ok := w.(*os.File); ok && isatty.IsTerminal(w.Fd()) {
@@ -102,12 +108,12 @@ func (l *Logger) SetOutput(w io.Writer) {
 }
 
 func (l *Logger) Print(i ...interface{}) {
-	fmt.Fprintln(l.out, i...)
+	fmt.Fprintln(l.output, i...)
 }
 
 func (l *Logger) Printf(format string, args ...interface{}) {
 	f := fmt.Sprintf("%s\n", format)
-	fmt.Fprintf(l.out, f, args...)
+	fmt.Fprintf(l.output, f, args...)
 }
 
 func (l *Logger) Debug(i ...interface{}) {
@@ -160,16 +166,32 @@ func EnableColor() {
 	global.EnableColor()
 }
 
+func Prefix() string {
+	return global.Prefix()
+}
+
 func SetPrefix(p string) {
 	global.SetPrefix(p)
 }
 
-func SetLevel(v Level) {
+func Level() uint8 {
+	return global.Level()
+}
+
+func SetLevel(v uint8) {
 	global.SetLevel(v)
+}
+
+func Output() io.Writer {
+	return global.Output()
 }
 
 func SetOutput(w io.Writer) {
 	global.SetOutput(w)
+}
+
+func SetFormat(f string) {
+	global.SetFormat(f)
 }
 
 func Print(i ...interface{}) {
@@ -220,20 +242,18 @@ func Fatalf(format string, args ...interface{}) {
 	global.Fatalf(format, args...)
 }
 
-func (l *Logger) log(v Level, format string, args ...interface{}) {
-	l.mu.Lock()
-	defer l.mu.Unlock()
+func (l *Logger) log(v uint8, format string, args ...interface{}) {
+	l.mutex.Lock()
+	defer l.mutex.Unlock()
 
 	if v >= l.level {
 		message := ""
-
 		if format == "" {
 			message = fmt.Sprint(args...)
 		} else {
 			message = fmt.Sprintf(format, args...)
 		}
-
-		l.template.ExecuteFunc(l.out, func(w io.Writer, tag string) (int, error) {
+		l.template.ExecuteFunc(l.output, func(w io.Writer, tag string) (int, error) {
 			switch tag {
 			case "time":
 				return w.Write([]byte(time.Now().Format(time.Stamp)))

@@ -33,10 +33,10 @@ func test(l *Logger, t *testing.T) {
 	assert.NotContains(t, b.String(), "debugf")
 	assert.NotContains(t, b.String(), "info")
 	assert.NotContains(t, b.String(), "infof")
-	assert.Contains(t, b.String(), "WARN|"+l.prefix+"|warn")
-	assert.Contains(t, b.String(), "WARN|"+l.prefix+"|warnf")
-	assert.Contains(t, b.String(), "ERROR|"+l.prefix+"|error")
-	assert.Contains(t, b.String(), "ERROR|"+l.prefix+"|errorf")
+	assert.Contains(t, b.String(), "WARN | "+l.prefix+" | warn")
+	assert.Contains(t, b.String(), "WARN | "+l.prefix+" | warnf")
+	assert.Contains(t, b.String(), "ERROR | "+l.prefix+" | error")
+	assert.Contains(t, b.String(), "ERROR | "+l.prefix+" | errorf")
 }
 
 func TestLog(t *testing.T) {
@@ -92,8 +92,16 @@ func loggerFatalTest(t *testing.T, env string, contains string) {
 func TestFormat(t *testing.T) {
 	l := New("test")
 	l.SetFormat("${level} | ${message}")
-	l.SetLevel(INFO)
 	b := new(bytes.Buffer)
 	l.SetOutput(b)
-	assert.Contains(t, "INFO | info", b.String())
+	l.Info("test")
+	assert.Contains(t, "INFO | test", b.String())
+}
+
+func BenchmarkLog(b *testing.B) {
+	l := New("test")
+	l.SetOutput(new(bytes.Buffer))
+	for i := 0; i < b.N; i++ {
+		l.Infof("Info=%s, Debug=%s", "info", "debug")
+	}
 }
