@@ -37,7 +37,7 @@ const (
 
 var (
 	global        = New("-")
-	defaultFormat = "${time} | ${level} | ${prefix} | ${message}\n"
+	defaultFormat = "time=${time_rfc3339}, level=${level}, prefix=${prefix}, message=${message}\n"
 )
 
 func New(prefix string) (l *Logger) {
@@ -255,8 +255,8 @@ func (l *Logger) log(v uint8, format string, args ...interface{}) {
 		}
 		l.template.ExecuteFunc(l.output, func(w io.Writer, tag string) (int, error) {
 			switch tag {
-			case "time":
-				return w.Write([]byte(time.Now().Format(time.Stamp)))
+			case "time_rfc3339":
+				return w.Write([]byte(time.Now().Format(time.RFC3339)))
 			case "level":
 				return w.Write([]byte(l.levels[v]))
 			case "prefix":
