@@ -37,7 +37,7 @@ const (
 
 var (
 	global        = New("-")
-	defaultFormat = "time=${time_rfc3339}, level=${level}, prefix=${prefix}, message=${message}\n"
+	defaultFormat = "time=${time_rfc3339}, level=${level}, prefix=${prefix}, ${message}\n"
 )
 
 func New(prefix string) (l *Logger) {
