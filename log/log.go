@@ -251,7 +251,7 @@ func (l *Logger) log(v uint8, format string, args ...interface{}) {
 	l.mutex.Lock()
 	defer l.mutex.Unlock()
 
-	_, file, line, _ := runtime.Caller(2)
+	_, file, line, _ := runtime.Caller(3)
 
 	if v >= l.level {
 		message := ""
