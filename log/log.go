@@ -4,8 +4,12 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path"
+	"runtime"
 	"sync"
 	"time"
+
+	"strconv"
 
 	"github.com/mattn/go-colorable"
 	"github.com/mattn/go-isatty"
@@ -37,7 +41,8 @@ const (
 
 var (
 	global        = New("-")
-	defaultFormat = "time=${time_rfc3339}, level=${level}, prefix=${prefix}, ${message}\n"
+	defaultFormat = "time=${time_rfc3339}, level=${level}, prefix=${prefix}, file=${file}, " +
+		"line=${line}, ${message}\n"
 )
 
 func New(prefix string) (l *Logger) {
@@ -246,6 +251,8 @@ func (l *Logger) log(v uint8, format string, args ...interface{}) {
 	l.mutex.Lock()
 	defer l.mutex.Unlock()
 
+	_, file, line, _ := runtime.Caller(2)
+
 	if v >= l.level {
 		message := ""
 		if format == "" {
@@ -261,6 +268,10 @@ func (l *Logger) log(v uint8, format string, args ...interface{}) {
 				return w.Write([]byte(l.levels[v]))
 			case "prefix":
 				return w.Write([]byte(l.prefix))
+			case "file":
+				return w.Write([]byte(path.Base(file)))
+			case "line":
+				return w.Write([]byte(strconv.Itoa(line)))
 			case "message":
 				return w.Write([]byte(message))
 			default:

@@ -33,10 +33,10 @@ func test(l *Logger, t *testing.T) {
 	assert.NotContains(t, b.String(), "debugf")
 	assert.NotContains(t, b.String(), "info")
 	assert.NotContains(t, b.String(), "infof")
-	assert.Contains(t, b.String(), "level=WARN, prefix="+l.prefix+", warn")
-	assert.Contains(t, b.String(), "level=WARN, prefix="+l.prefix+", warnf")
-	assert.Contains(t, b.String(), "level=ERROR, prefix="+l.prefix+", error")
-	assert.Contains(t, b.String(), "level=ERROR, prefix="+l.prefix+", errorf")
+	assert.Contains(t, b.String(), "level=WARN, prefix="+l.prefix)
+	assert.Contains(t, b.String(), "level=WARN, prefix="+l.prefix)
+	assert.Contains(t, b.String(), "level=ERROR, prefix="+l.prefix)
+	assert.Contains(t, b.String(), "level=ERROR, prefix="+l.prefix)
 }
 
 func TestLog(t *testing.T) {
