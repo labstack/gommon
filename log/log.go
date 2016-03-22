@@ -41,7 +41,7 @@ const (
 
 var (
 	global        = New("-")
-	defaultFormat = "time=${time_rfc3339}, level=${level}, prefix=${prefix}, file=${file}, " +
+	defaultFormat = "time=${time_rfc3339}, level=${level}, prefix=${prefix}, file=${short_file}, " +
 		"line=${line}, ${message}\n"
 )
 
@@ -268,7 +268,9 @@ func (l *Logger) log(v uint8, format string, args ...interface{}) {
 				return w.Write([]byte(l.levels[v]))
 			case "prefix":
 				return w.Write([]byte(l.prefix))
-			case "file":
+			case "long_file":
+				return w.Write([]byte(file))
+			case "short_file":
 				return w.Write([]byte(path.Base(file)))
 			case "line":
 				return w.Write([]byte(strconv.Itoa(line)))
