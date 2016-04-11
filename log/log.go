@@ -105,10 +105,8 @@ func (l *Logger) SetFormat(f string) {
 
 func (l *Logger) SetOutput(w io.Writer) {
 	l.output = w
-	l.DisableColor()
-
-	if w, ok := w.(*os.File); ok && isatty.IsTerminal(w.Fd()) {
-		l.EnableColor()
+	if w, ok := w.(*os.File); !ok || !isatty.IsTerminal(w.Fd()) {
+		l.DisableColor()
 	}
 }
 
