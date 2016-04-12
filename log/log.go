@@ -42,7 +42,7 @@ const (
 var (
 	global        = New("-")
 	defaultFormat = "time=${time_rfc3339}, level=${level}, prefix=${prefix}, file=${short_file}, " +
-		"line=${line}, ${message}\n"
+		"line=${line}, message=${message}\n"
 )
 
 func New(prefix string) (l *Logger) {
@@ -51,6 +51,7 @@ func New(prefix string) (l *Logger) {
 		prefix:   prefix,
 		template: l.newTemplate(defaultFormat),
 	}
+	l.initLevels()
 	l.SetOutput(colorable.NewColorableStdout())
 	return
 }
@@ -257,6 +258,11 @@ func (l *Logger) log(v uint8, format string, args ...interface{}) {
 			message = fmt.Sprint(args...)
 		} else {
 			message = fmt.Sprintf(format, args...)
+		}
+		if v == FATAL {
+			stack := make([]byte, 4<<10)
+			length := runtime.Stack(stack, true)
+			message = message + "\n" + string(stack[:length])
 		}
 		l.template.ExecuteFunc(l.output, func(w io.Writer, tag string) (int, error) {
 			switch tag {
