@@ -86,7 +86,7 @@ var (
 	whiteBg   = outer(WhtBg)
 
 	reset     = outer(R)
-	bolt      = outer(B)
+	bold      = outer(B)
 	dim       = outer(D)
 	italic    = outer(I)
 	underline = outer(U)
@@ -210,7 +210,7 @@ func (c *Color) Reset(msg interface{}, styles ...string) string {
 }
 
 func (c *Color) Bold(msg interface{}, styles ...string) string {
-	return bolt(msg, styles, c)
+	return bold(msg, styles, c)
 }
 
 func (c *Color) Dim(msg interface{}, styles ...string) string {

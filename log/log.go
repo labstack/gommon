@@ -1,6 +1,7 @@
 package log
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"os"
@@ -20,13 +21,14 @@ import (
 
 type (
 	Logger struct {
-		prefix   string
-		level    uint8
-		output   io.Writer
-		template *fasttemplate.Template
-		levels   []string
-		color    color.Color
-		mutex    sync.Mutex
+		prefix     string
+		level      uint8
+		output     io.Writer
+		template   *fasttemplate.Template
+		levels     []string
+		color      *color.Color
+		bufferPool sync.Pool
+		mutex      sync.Mutex
 	}
 )
 
@@ -50,6 +52,12 @@ func New(prefix string) (l *Logger) {
 		level:    INFO,
 		prefix:   prefix,
 		template: l.newTemplate(defaultFormat),
+		color:    color.New(),
+		bufferPool: sync.Pool{
+			New: func() interface{} {
+				return bytes.NewBuffer(make([]byte, 256))
+			},
+		},
 	}
 	l.initLevels()
 	l.SetOutput(colorable.NewColorableStdout())
@@ -249,7 +257,9 @@ func Fatalf(format string, args ...interface{}) {
 func (l *Logger) log(v uint8, format string, args ...interface{}) {
 	l.mutex.Lock()
 	defer l.mutex.Unlock()
-
+	buf := l.bufferPool.Get().(*bytes.Buffer)
+	buf.Reset()
+	defer l.bufferPool.Put(buf)
 	_, file, line, _ := runtime.Caller(3)
 
 	if v >= l.level {
@@ -264,7 +274,7 @@ func (l *Logger) log(v uint8, format string, args ...interface{}) {
 			length := runtime.Stack(stack, true)
 			message = message + "\n" + string(stack[:length])
 		}
-		l.template.ExecuteFunc(l.output, func(w io.Writer, tag string) (int, error) {
+		_, err := l.template.ExecuteFunc(buf, func(w io.Writer, tag string) (int, error) {
 			switch tag {
 			case "time_rfc3339":
 				return w.Write([]byte(time.Now().Format(time.RFC3339)))
@@ -284,5 +294,8 @@ func (l *Logger) log(v uint8, format string, args ...interface{}) {
 				return w.Write([]byte(fmt.Sprintf("[unknown tag %s]", tag)))
 			}
 		})
+		if err == nil {
+			l.output.Write(buf.Bytes())
+		}
 	}
 }
