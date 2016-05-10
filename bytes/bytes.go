@@ -33,13 +33,13 @@ func New() *Bytes {
 
 // Format formats bytes integer to human readable string.
 // For example, 31323 bytes will return 30.59KB.
-func (*Bytes) Format(b int) string {
+func (*Bytes) Format(b int64) string {
 	multiple := ""
 	value := float32(b)
 
 	switch {
 	case b < KB:
-		return strconv.Itoa(b) + "B"
+		return strconv.FormatInt(b, 10) + "B"
 	case b < MB:
 		value /= KB
 		multiple = "KB"
@@ -65,14 +65,14 @@ func (*Bytes) Format(b int) string {
 
 // Parse parses human readable bytes string to bytes integer.
 // For example, 6GB (6G is also valid) will return 6442450944.
-func (*Bytes) Parse(value string) (i int, err error) {
+func (*Bytes) Parse(value string) (i int64, err error) {
 	parts := pattern.FindStringSubmatch(value)
 	if len(parts) < 3 {
 		return 0, fmt.Errorf("error parsing value=%s", value)
 	}
 	bytesString := parts[1]
 	multiple := parts[2]
-	bytes, err := strconv.Atoi(bytesString)
+	bytes, err := strconv.ParseInt(bytesString, 10, 64)
 	if err != nil {
 		return
 	}
@@ -96,11 +96,11 @@ func (*Bytes) Parse(value string) (i int, err error) {
 }
 
 // Format wraps global Bytes's Format function.
-func Format(b int) string {
+func Format(b int64) string {
 	return global.Format(b)
 }
 
 // Parse wraps global Bytes's Parse function.
-func Parse(val string) (int, error) {
+func Parse(val string) (int64, error) {
 	return global.Parse(val)
 }

@@ -2,6 +2,7 @@ package log
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -30,6 +31,8 @@ type (
 		bufferPool sync.Pool
 		mutex      sync.Mutex
 	}
+
+	Fields map[string]interface{}
 )
 
 const (
@@ -43,8 +46,8 @@ const (
 
 var (
 	global        = New("-")
-	defaultFormat = "time=${time_rfc3339}, level=${level}, prefix=${prefix}, file=${short_file}, " +
-		"line=${line}, message=${message}\n"
+	defaultFormat = `{"time":"${time_rfc3339}","level":"${level}","prefix":"${prefix}",` +
+		`"file":"${short_file}","line":"${line}","message":"${message}"}` + "\n"
 )
 
 func New(prefix string) (l *Logger) {
@@ -298,4 +301,12 @@ func (l *Logger) log(v uint8, format string, args ...interface{}) {
 			l.output.Write(buf.Bytes())
 		}
 	}
+}
+
+func JSON(f Fields) string {
+	s, err := json.Marshal(f)
+	if err != nil {
+		panic(err)
+	}
+	return string(s)
 }
