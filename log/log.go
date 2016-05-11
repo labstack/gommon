@@ -36,7 +36,7 @@ type (
 )
 
 const (
-	DEBUG = iota
+	DEBUG uint8 = iota
 	INFO
 	WARN
 	ERROR
