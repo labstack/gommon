@@ -35,7 +35,7 @@ func New() *Bytes {
 // For example, 31323 bytes will return 30.59KB.
 func (*Bytes) Format(b int64) string {
 	multiple := ""
-	value := float32(b)
+	value := float64(b)
 
 	switch {
 	case b < KB:
