@@ -89,19 +89,25 @@ func loggerFatalTest(t *testing.T, env string, contains string) {
 	t.Fatalf("process ran with err %v, want exit status 1", err)
 }
 
+func TestNoFormat(t *testing.T) {
+}
+
 func TestFormat(t *testing.T) {
 	l := New("test")
-	l.SetFormat("${level} | ${message}")
+	l.SetHeader("${level} | ${prefix}")
 	b := new(bytes.Buffer)
 	l.SetOutput(b)
-	l.Info("test")
-	assert.Equal(t, "INFO | test", b.String())
+	l.Info("info")
+	assert.Equal(t, "INFO | test info\n", b.String())
 }
 
 func TestJSON(t *testing.T) {
-	Info(JSON(Fields{
-		"foo": "bar",
-	}))
+	l := New("test")
+	b := new(bytes.Buffer)
+	l.SetOutput(b)
+	l.SetLevel(DEBUG)
+	l.Debugj(JSON{"name": "value"})
+	assert.Contains(t, b.String(), `"name":"value"`)
 }
 
 func BenchmarkLog(b *testing.B) {

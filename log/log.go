@@ -23,7 +23,7 @@ import (
 type (
 	Logger struct {
 		prefix     string
-		level      uint8
+		level      Lvl
 		output     io.Writer
 		template   *fasttemplate.Template
 		levels     []string
@@ -32,11 +32,13 @@ type (
 		mutex      sync.Mutex
 	}
 
-	Fields map[string]interface{}
+	Lvl uint8
+
+	JSON map[string]interface{}
 )
 
 const (
-	DEBUG uint8 = iota
+	DEBUG Lvl = iota
 	INFO
 	WARN
 	ERROR
@@ -46,15 +48,15 @@ const (
 
 var (
 	global        = New("-")
-	defaultFormat = `{"time":"${time_rfc3339}","level":"${level}","prefix":"${prefix}",` +
-		`"file":"${short_file}","line":"${line}","message":"${message}"}` + "\n"
+	defaultHeader = `{"time":"${time_rfc3339}","level":"${level}","prefix":"${prefix}",` +
+		`"file":"${short_file}","line":"${line}"}`
 )
 
 func New(prefix string) (l *Logger) {
 	l = &Logger{
 		level:    INFO,
 		prefix:   prefix,
-		template: l.newTemplate(defaultFormat),
+		template: l.newTemplate(defaultHeader),
 		color:    color.New(),
 		bufferPool: sync.Pool{
 			New: func() interface{} {
@@ -99,11 +101,11 @@ func (l *Logger) SetPrefix(p string) {
 	l.prefix = p
 }
 
-func (l *Logger) Level() uint8 {
+func (l *Logger) Level() Lvl {
 	return l.level
 }
 
-func (l *Logger) SetLevel(v uint8) {
+func (l *Logger) SetLevel(v Lvl) {
 	l.level = v
 }
 
@@ -111,8 +113,8 @@ func (l *Logger) Output() io.Writer {
 	return l.output
 }
 
-func (l *Logger) SetFormat(f string) {
-	l.template = l.newTemplate(f)
+func (l *Logger) SetHeader(h string) {
+	l.template = l.newTemplate(h)
 }
 
 func (l *Logger) SetOutput(w io.Writer) {
@@ -131,12 +133,20 @@ func (l *Logger) Printf(format string, args ...interface{}) {
 	fmt.Fprintf(l.output, f, args...)
 }
 
+func (l *Logger) Printj(j JSON) {
+	json.NewEncoder(l.output).Encode(j)
+}
+
 func (l *Logger) Debug(i ...interface{}) {
 	l.log(DEBUG, "", i...)
 }
 
 func (l *Logger) Debugf(format string, args ...interface{}) {
 	l.log(DEBUG, format, args...)
+}
+
+func (l *Logger) Debugj(j JSON) {
+	l.log(DEBUG, "json", j)
 }
 
 func (l *Logger) Info(i ...interface{}) {
@@ -147,12 +157,20 @@ func (l *Logger) Infof(format string, args ...interface{}) {
 	l.log(INFO, format, args...)
 }
 
+func (l *Logger) Infoj(j JSON) {
+	l.log(INFO, "json", j)
+}
+
 func (l *Logger) Warn(i ...interface{}) {
 	l.log(WARN, "", i...)
 }
 
 func (l *Logger) Warnf(format string, args ...interface{}) {
 	l.log(WARN, format, args...)
+}
+
+func (l *Logger) Warnj(j JSON) {
+	l.log(WARN, "json", j)
 }
 
 func (l *Logger) Error(i ...interface{}) {
@@ -163,6 +181,10 @@ func (l *Logger) Errorf(format string, args ...interface{}) {
 	l.log(ERROR, format, args...)
 }
 
+func (l *Logger) Errorj(j JSON) {
+	l.log(ERROR, "json", j)
+}
+
 func (l *Logger) Fatal(i ...interface{}) {
 	l.log(FATAL, "", i...)
 	os.Exit(1)
@@ -171,6 +193,10 @@ func (l *Logger) Fatal(i ...interface{}) {
 func (l *Logger) Fatalf(format string, args ...interface{}) {
 	l.log(FATAL, format, args...)
 	os.Exit(1)
+}
+
+func (l *Logger) Fatalj(j JSON) {
+	l.log(FATAL, "json", j)
 }
 
 func DisableColor() {
@@ -189,11 +215,11 @@ func SetPrefix(p string) {
 	global.SetPrefix(p)
 }
 
-func Level() uint8 {
+func Level() Lvl {
 	return global.Level()
 }
 
-func SetLevel(v uint8) {
+func SetLevel(v Lvl) {
 	global.SetLevel(v)
 }
 
@@ -205,8 +231,8 @@ func SetOutput(w io.Writer) {
 	global.SetOutput(w)
 }
 
-func SetFormat(f string) {
-	global.SetFormat(f)
+func SetHeader(h string) {
+	global.SetHeader(h)
 }
 
 func Print(i ...interface{}) {
@@ -217,12 +243,20 @@ func Printf(format string, args ...interface{}) {
 	global.Printf(format, args...)
 }
 
+func Printj(j JSON) {
+	global.Printj(j)
+}
+
 func Debug(i ...interface{}) {
 	global.Debug(i...)
 }
 
 func Debugf(format string, args ...interface{}) {
 	global.Debugf(format, args...)
+}
+
+func Debugj(j JSON) {
+	global.Debugj(j)
 }
 
 func Info(i ...interface{}) {
@@ -233,12 +267,20 @@ func Infof(format string, args ...interface{}) {
 	global.Infof(format, args...)
 }
 
+func Infoj(j JSON) {
+	global.Infoj(j)
+}
+
 func Warn(i ...interface{}) {
 	global.Warn(i...)
 }
 
 func Warnf(format string, args ...interface{}) {
 	global.Warnf(format, args...)
+}
+
+func Warnj(j JSON) {
+	global.Warnj(j)
 }
 
 func Error(i ...interface{}) {
@@ -249,6 +291,10 @@ func Errorf(format string, args ...interface{}) {
 	global.Errorf(format, args...)
 }
 
+func Errorj(j JSON) {
+	global.Errorj(j)
+}
+
 func Fatal(i ...interface{}) {
 	global.Fatal(i...)
 }
@@ -257,7 +303,11 @@ func Fatalf(format string, args ...interface{}) {
 	global.Fatalf(format, args...)
 }
 
-func (l *Logger) log(v uint8, format string, args ...interface{}) {
+func Fatalj(j JSON) {
+	global.Fatalj(j)
+}
+
+func (l *Logger) log(v Lvl, format string, args ...interface{}) {
 	l.mutex.Lock()
 	defer l.mutex.Unlock()
 	buf := l.bufferPool.Get().(*bytes.Buffer)
@@ -269,14 +319,20 @@ func (l *Logger) log(v uint8, format string, args ...interface{}) {
 		message := ""
 		if format == "" {
 			message = fmt.Sprint(args...)
+		} else if format == "json" {
+			b, err := json.Marshal(args[0])
+			if err != nil {
+				panic(err)
+			}
+			message = string(b)
 		} else {
 			message = fmt.Sprintf(format, args...)
 		}
-		if v == FATAL {
-			stack := make([]byte, 4<<10)
-			length := runtime.Stack(stack, true)
-			message = message + "\n" + string(stack[:length])
+
+		if v >= ERROR {
+			// panic(message)
 		}
+
 		_, err := l.template.ExecuteFunc(buf, func(w io.Writer, tag string) (int, error) {
 			switch tag {
 			case "time_rfc3339":
@@ -291,22 +347,31 @@ func (l *Logger) log(v uint8, format string, args ...interface{}) {
 				return w.Write([]byte(path.Base(file)))
 			case "line":
 				return w.Write([]byte(strconv.Itoa(line)))
-			case "message":
-				return w.Write([]byte(message))
-			default:
-				return w.Write([]byte(fmt.Sprintf("[unknown tag %s]", tag)))
 			}
+			return 0, nil
 		})
+
 		if err == nil {
+			s := buf.String()
+			i := buf.Len() - 1
+			if s[i] == '}' {
+				// JSON header
+				buf.Truncate(i)
+				buf.WriteByte(',')
+				if format == "json" {
+					buf.WriteString(message[1:])
+				} else {
+					buf.WriteString(`"message":"`)
+					buf.WriteString(message)
+					buf.WriteString(`"}`)
+				}
+			} else {
+				// Text header
+				buf.WriteByte(' ')
+				buf.WriteString(message)
+			}
+			buf.WriteByte('\n')
 			l.output.Write(buf.Bytes())
 		}
 	}
-}
-
-func JSON(f Fields) string {
-	s, err := json.Marshal(f)
-	if err != nil {
-		panic(err)
-	}
-	return string(s)
 }

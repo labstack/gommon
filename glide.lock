@@ -1,18 +1,29 @@
 hash: e55ed1b26ebd131b2a6f7bb5bcbac90529cccd68976513e2648f38fe55fdd807
-updated: 2016-04-24T08:29:37.021386935-07:00
+updated: 2016-06-08T15:29:54.93330773-07:00
 imports:
 - name: github.com/mattn/go-colorable
-  version: bc69d6cebca8dd5675346a34a1c545b67dc74d5e
+  version: 9056b7a9f2d1f2d96498d6d146acd1f9d5ed3d59
 - name: github.com/mattn/go-isatty
   version: 56b76bdf51f7708750eac80fa38b952bb9f32639
 - name: github.com/stretchr/testify
-  version: c5d7a69bf8a2c9c374798160849c071093e41dd1
+  version: 8d64eb7173c7753d6419fd4a9caf057398611364
   subpackages:
   - assert
 - name: github.com/valyala/fasttemplate
   version: 3b874956e03f1636d171bda64b130f9135f42cff
-- name: golang.org/x/sys
-  version: f64b50fbea64174967a8882830d621a18ee1548e
+- name: gopkg.in/bsm/ratelimit.v1
+  version: db14e161995a5177acef654cb0dd785e8ee8bc22
+- name: gopkg.in/mgo.v2
+  version: b6e2fa371e64216a45e61072a96d4e3859f169da
   subpackages:
-  - unix
+  - bson
+  - internal/sasl
+  - internal/scram
+- name: gopkg.in/redis.v3
+  version: 5183f8dcde9737db7583dbfa9881800dba26e3fa
+  subpackages:
+  - internal
+  - internal/consistenthash
+  - internal/hashtag
+  - internal/pool
 devImports: []
