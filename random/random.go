@@ -31,12 +31,20 @@ func New() *Random {
 	}
 }
 
+func (r *Random) SetCharset(c Charset) {
+	r.charset = c
+}
+
 func (r *Random) String(length uint8) string {
 	b := make([]byte, length)
 	for i := range b {
 		b[i] = r.charset[rand.Int63()%int64(len(r.charset))]
 	}
 	return string(b)
+}
+
+func SetCharset(c Charset) {
+	global.SetCharset(c)
 }
 
 func String(length uint8) string {
