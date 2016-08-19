@@ -2,8 +2,11 @@
 
 package log
 
-import "io"
+import (
+	"io"
+	"os"
+)
 
 func output() io.Writer {
-	return os.stdout
+	return os.Stdout
 }
