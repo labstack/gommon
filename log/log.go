@@ -13,7 +13,6 @@ import (
 
 	"strconv"
 
-	"github.com/mattn/go-colorable"
 	"github.com/mattn/go-isatty"
 	"github.com/valyala/fasttemplate"
 
@@ -65,7 +64,7 @@ func New(prefix string) (l *Logger) {
 		},
 	}
 	l.initLevels()
-	l.SetOutput(colorable.NewColorableStdout())
+	l.SetOutput(output())
 	return
 }
 
