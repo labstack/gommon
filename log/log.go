@@ -13,7 +13,6 @@ import (
 
 	"strconv"
 
-	"github.com/mattn/go-isatty"
 	"github.com/valyala/fasttemplate"
 
 	"github.com/labstack/gommon/color"
@@ -112,15 +111,19 @@ func (l *Logger) Output() io.Writer {
 	return l.output
 }
 
-func (l *Logger) SetHeader(h string) {
-	l.template = l.newTemplate(h)
-}
-
 func (l *Logger) SetOutput(w io.Writer) {
 	l.output = w
 	if w, ok := w.(*os.File); !ok || !isatty.IsTerminal(w.Fd()) {
 		l.DisableColor()
 	}
+}
+
+func (l *Logger) Color() *color.Color {
+	return l.color
+}
+
+func (l *Logger) SetHeader(h string) {
+	l.template = l.newTemplate(h)
 }
 
 func (l *Logger) Print(i ...interface{}) {
