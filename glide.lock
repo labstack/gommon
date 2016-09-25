@@ -1,29 +1,26 @@
 hash: e55ed1b26ebd131b2a6f7bb5bcbac90529cccd68976513e2648f38fe55fdd807
-updated: 2016-06-08T15:29:54.93330773-07:00
+updated: 2016-09-21T20:58:00.346062044-07:00
 imports:
 - name: github.com/mattn/go-colorable
-  version: 9056b7a9f2d1f2d96498d6d146acd1f9d5ed3d59
+  version: ed8eb9e318d7a84ce5915b495b7d35e0cfe7b5a8
 - name: github.com/mattn/go-isatty
-  version: 56b76bdf51f7708750eac80fa38b952bb9f32639
+  version: 66b8e73f3f5cda9f96b69efd03dd3d7fc4a5cdb8
 - name: github.com/stretchr/testify
-  version: 8d64eb7173c7753d6419fd4a9caf057398611364
+  version: d77da356e56a7428ad25149ca77381849a6a5232
   subpackages:
   - assert
 - name: github.com/valyala/fasttemplate
   version: 3b874956e03f1636d171bda64b130f9135f42cff
-- name: gopkg.in/bsm/ratelimit.v1
-  version: db14e161995a5177acef654cb0dd785e8ee8bc22
-- name: gopkg.in/mgo.v2
-  version: b6e2fa371e64216a45e61072a96d4e3859f169da
+- name: golang.org/x/sys
+  version: 8f0908ab3b2457e2e15403d3697c9ef5cb4b57a9
   subpackages:
-  - bson
-  - internal/sasl
-  - internal/scram
-- name: gopkg.in/redis.v3
-  version: 5183f8dcde9737db7583dbfa9881800dba26e3fa
+  - unix
+testImports:
+- name: github.com/davecgh/go-spew
+  version: 5215b55f46b2b919f50a1df0eaa5886afe4e3b3d
   subpackages:
-  - internal
-  - internal/consistenthash
-  - internal/hashtag
-  - internal/pool
-devImports: []
+  - spew
+- name: github.com/pmezard/go-difflib
+  version: d8ed2627bdf02c080bf22230dbb337003b7aba2d
+  subpackages:
+  - difflib
