@@ -132,8 +132,7 @@ func (l *Logger) Print(i ...interface{}) {
 }
 
 func (l *Logger) Printf(format string, args ...interface{}) {
-	f := fmt.Sprintf("%s\n", format)
-	fmt.Fprintf(l.output, f, args...)
+	fmt.Fprintf(l.output, format, args...)
 }
 
 func (l *Logger) Printj(j JSON) {
