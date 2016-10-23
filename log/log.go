@@ -331,10 +331,6 @@ func (l *Logger) log(v Lvl, format string, args ...interface{}) {
 			message = fmt.Sprintf(format, args...)
 		}
 
-		if v >= ERROR {
-			// panic(message)
-		}
-
 		_, err := l.template.ExecuteFunc(buf, func(w io.Writer, tag string) (int, error) {
 			switch tag {
 			case "time_rfc3339":
