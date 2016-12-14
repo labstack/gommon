@@ -363,6 +363,8 @@ func (l *Logger) log(v Lvl, format string, args ...interface{}) {
 			switch tag {
 			case "time_rfc3339":
 				return w.Write([]byte(time.Now().Format(time.RFC3339)))
+			case "time_rfc3339nano":
+				return w.Write([]byte(time.Now().Format(time.RFC3339Nano)))
 			case "level":
 				return w.Write([]byte(l.levels[v]))
 			case "prefix":
