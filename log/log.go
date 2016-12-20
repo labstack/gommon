@@ -387,9 +387,9 @@ func (l *Logger) log(v Lvl, format string, args ...interface{}) {
 				if format == "json" {
 					buf.WriteString(message[1:])
 				} else {
-					buf.WriteString(`"message":"`)
-					buf.WriteString(message)
-					buf.WriteString(`"}`)
+					buf.WriteString(`"message":`)
+					buf.WriteString(strconv.Quote(message))
+					buf.WriteString(`}`)
 				}
 			} else {
 				// Text header
