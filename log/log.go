@@ -343,7 +343,7 @@ func (l *Logger) log(v Lvl, format string, args ...interface{}) {
 	buf := l.bufferPool.Get().(*bytes.Buffer)
 	buf.Reset()
 	defer l.bufferPool.Put(buf)
-	_, file, line, _ := runtime.Caller(2)
+	_, file, line, _ := runtime.Caller(3)
 
 	if v >= l.level || v == 0 {
 		message := ""
