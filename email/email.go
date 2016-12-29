@@ -15,7 +15,6 @@ type (
 		Auth        smtp.Auth
 		Template    *template.Template
 		smtpAddress string
-		// TextTemplates text.Template
 	}
 
 	Message struct {
@@ -78,7 +77,7 @@ func (e *Email) Send(m *Message) error {
 		if err := e.Template.ExecuteTemplate(buf, m.TemplateName, m.TemplateData); err != nil {
 			return err
 		}
-		m.writeText(buf.String(), "text/plain")
+		m.writeText(buf.String(), "text/html")
 	} else if m.Text != "" {
 		m.writeText(m.Text, "text/plain")
 	} else if m.HTML != "" {
