@@ -64,7 +64,6 @@ func (m *Message) writeFile(f *File, disposition string) {
 }
 
 func (e *Email) Send(m *Message) error {
-	// Construct message
 	m.buffer = new(bytes.Buffer)
 	m.boundary = random.String(16)
 	m.buffer.WriteString("MIME-Version: 1.0\r\n")
@@ -72,16 +71,23 @@ func (e *Email) Send(m *Message) error {
 	m.buffer.WriteString(fmt.Sprintf("Subject: %s\r\n", m.Subject))
 	m.buffer.WriteString(fmt.Sprintf("Content-Type: multipart/mixed; boundary=%s\r\n", m.boundary))
 	m.buffer.WriteString("\r\n")
+
+	// Message body
 	if m.TemplateName != "" {
 		buf := new(bytes.Buffer)
 		if err := e.Template.ExecuteTemplate(buf, m.TemplateName, m.TemplateData); err != nil {
 			return err
 		}
 		m.writeText(buf.String(), "text/plain")
-	} else {
+	} else if m.Text != "" {
 		m.writeText(m.Text, "text/plain")
+	} else if m.HTML != "" {
 		m.writeText(m.HTML, "text/html")
+	} else {
+		// TODO:
 	}
+
+	// Attachments / inlines
 	for _, f := range m.Inlines {
 		m.writeFile(f, "inline")
 	}
