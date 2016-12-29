@@ -64,8 +64,6 @@ func (e *Email) Send(m *Message) error {
 	m.buffer = new(bytes.Buffer)
 	m.boundary = random.String(16)
 	m.buffer.WriteString("MIME-Version: 1.0\r\n")
-	m.buffer.WriteString(fmt.Sprintf("From: %s\r\n", m.From))
-	m.buffer.WriteString(fmt.Sprintf("To: %s\r\n", m.To))
 	m.buffer.WriteString(fmt.Sprintf("CC: %s\r\n", m.CC))
 	m.buffer.WriteString(fmt.Sprintf("Subject: %s\r\n", m.Subject))
 	m.buffer.WriteString(fmt.Sprintf("Content-Type: multipart/mixed; boundary=%s\r\n", m.boundary))
