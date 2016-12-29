@@ -3,6 +3,7 @@ package email
 import (
 	"bytes"
 	"fmt"
+	"html/template"
 	"net/mail"
 	"net/smtp"
 
@@ -12,27 +13,30 @@ import (
 type (
 	Email struct {
 		Auth        smtp.Auth
+		Template    *template.Template
 		smtpAddress string
 		// TextTemplates text.Template
 	}
 
 	Message struct {
-		From        string
-		To          string
-		CC          string
-		Subject     string
-		Text        string
-		HTML        string
-		Inlines     []*File
-		Attachments []*File
-		buffer      *bytes.Buffer
-		boundary    string
+		From         string
+		To           string
+		CC           string
+		Subject      string
+		Text         string
+		HTML         string
+		TemplateName string
+		TemplateData interface{}
+		Inlines      []*File
+		Attachments  []*File
+		buffer       *bytes.Buffer
+		boundary     string
 	}
 
 	File struct {
-		Name    string `json:"name"`
-		Type    string `json:"type"`
-		Content string `json:"content"`
+		Name    string
+		Type    string
+		Content string
 	}
 )
 
@@ -68,8 +72,16 @@ func (e *Email) Send(m *Message) error {
 	m.buffer.WriteString(fmt.Sprintf("Subject: %s\r\n", m.Subject))
 	m.buffer.WriteString(fmt.Sprintf("Content-Type: multipart/mixed; boundary=%s\r\n", m.boundary))
 	m.buffer.WriteString("\r\n")
-	m.writeText(m.Text, "text/plain")
-	m.writeText(m.HTML, "text/html")
+	if m.TemplateName != "" {
+		buf := new(bytes.Buffer)
+		if err := e.Template.ExecuteTemplate(buf, m.TemplateName, m.TemplateData); err != nil {
+			return err
+		}
+		m.writeText(buf.String(), "text/plain")
+	} else {
+		m.writeText(m.Text, "text/plain")
+		m.writeText(m.HTML, "text/html")
+	}
 	for _, f := range m.Inlines {
 		m.writeFile(f, "inline")
 	}
