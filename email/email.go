@@ -78,7 +78,7 @@ func (e *Email) Send(m *Message) (err error) {
 	m.buffer.WriteString(fmt.Sprintf("Message-Id: %s\r\n", m.ID))
 	m.buffer.WriteString(fmt.Sprintf("Date: %s\r\n", time.Now().Format(time.RFC1123Z)))
 	m.buffer.WriteString(fmt.Sprintf("From: %s\r\n", m.From))
-	m.buffer.WriteString(fmt.Sprintf("To: %s\r\n", m.From))
+	m.buffer.WriteString(fmt.Sprintf("To: %s\r\n", m.To))
 	if m.CC != "" {
 		m.buffer.WriteString(fmt.Sprintf("CC: %s\r\n", m.CC))
 	}
