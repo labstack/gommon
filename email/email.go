@@ -24,25 +24,23 @@ type (
 	}
 
 	Message struct {
-		ID           string      `json:"id"`
-		From         string      `json:"from"`
-		To           string      `json:"to"`
-		CC           string      `json:"cc"`
-		Subject      string      `json:"subject"`
-		Text         string      `json:"text"`
-		HTML         string      `json:"html"`
-		TemplateName string      `json:"template_name"`
-		TemplateData interface{} `json:"template_data"`
-		Inlines      []*File     `json:"inlines"`
-		Attachments  []*File     `json:"attachments"`
-		buffer       *bytes.Buffer
-		boundary     string
+		ID          string
+		From        string
+		To          string
+		CC          string
+		Subject     string
+		Text        string
+		HTML        string
+		Inlines     []*File
+		Attachments []*File
+		buffer      *bytes.Buffer
+		boundary    string
 	}
 
 	File struct {
-		Name    string `json:"name"`
-		Type    string `json:"type"`
-		Content string `json:"content"`
+		Name    string
+		Type    string
+		Content string
 	}
 )
 
@@ -93,13 +91,7 @@ func (e *Email) Send(m *Message) (err error) {
 	m.buffer.WriteString("\r\n")
 
 	// Message body
-	if m.TemplateName != "" {
-		buf := new(bytes.Buffer)
-		if err = e.Template.ExecuteTemplate(buf, m.TemplateName, m.TemplateData); err != nil {
-			return
-		}
-		m.writeText(buf.String(), "text/html")
-	} else if m.Text != "" {
+	if m.Text != "" {
 		m.writeText(m.Text, "text/plain")
 	} else if m.HTML != "" {
 		m.writeText(m.HTML, "text/html")
