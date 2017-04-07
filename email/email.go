@@ -52,43 +52,43 @@ func New(smtpAddress string) *Email {
 }
 
 func (m *Message) writeText(content string, contentType string) {
-	m.buffer.WriteString(fmt.Sprintf("--%s\n", m.boundary))
-	m.buffer.WriteString(fmt.Sprintf("Content-Type: %s; charset=UTF-8\n", contentType))
-	m.buffer.WriteString("Content-Transfer-Encoding: quoted-printable\n")
-	m.buffer.WriteString("\n")
-	m.buffer.WriteString(content + "\n")
+	m.buffer.WriteString(fmt.Sprintf("--%s\r\n", m.boundary))
+	m.buffer.WriteString(fmt.Sprintf("Content-Type: %s; charset=UTF-8\r\n", contentType))
+	m.buffer.WriteString("Content-Transfer-Encoding: quoted-printable\r\n")
+	m.buffer.WriteString("\r\n")
+	m.buffer.WriteString(content + "\r\n")
 }
 
 func (m *Message) writeFile(f *File, disposition string) {
-	m.buffer.WriteString(fmt.Sprintf("--%s\n", m.boundary))
-	m.buffer.WriteString(fmt.Sprintf("Content-Type: %s; name=%s\n", f.Type, f.Name))
-	m.buffer.WriteString(fmt.Sprintf("Content-Disposition: %s; filename=%s\n", disposition, f.Name))
-	m.buffer.WriteString("Content-Transfer-Encoding: base64\n")
-	m.buffer.WriteString("\n")
-	m.buffer.WriteString(f.Content + "\n")
+	m.buffer.WriteString(fmt.Sprintf("--%s\r\n", m.boundary))
+	m.buffer.WriteString(fmt.Sprintf("Content-Type: %s; name=%s\r\n", f.Type, f.Name))
+	m.buffer.WriteString(fmt.Sprintf("Content-Disposition: %s; filename=%s\r\n", disposition, f.Name))
+	m.buffer.WriteString("Content-Transfer-Encoding: base64\r\n")
+	m.buffer.WriteString("\r\n")
+	m.buffer.WriteString(f.Content + "\r\n")
 }
 
 func (e *Email) Send(m *Message) (err error) {
 	// Message header
 	m.buffer = new(bytes.Buffer)
 	m.boundary = random.String(16)
-	m.buffer.WriteString("MIME-Version: 1.0\n")
-	m.buffer.WriteString(fmt.Sprintf("Message-ID: %s\n", m.ID))
-	m.buffer.WriteString(fmt.Sprintf("Date: %s\n", time.Now().Format(time.RFC1123Z)))
-	m.buffer.WriteString(fmt.Sprintf("From: %s\n", m.From))
-	m.buffer.WriteString(fmt.Sprintf("To: %s\n", m.To))
+	m.buffer.WriteString("MIME-Version: 1.0\r\n")
+	m.buffer.WriteString(fmt.Sprintf("Message-ID: %s\r\n", m.ID))
+	m.buffer.WriteString(fmt.Sprintf("Date: %s\r\n", time.Now().Format(time.RFC1123Z)))
+	m.buffer.WriteString(fmt.Sprintf("From: %s\r\n", m.From))
+	m.buffer.WriteString(fmt.Sprintf("To: %s\r\n", m.To))
 	if m.CC != "" {
-		m.buffer.WriteString(fmt.Sprintf("CC: %s\n", m.CC))
+		m.buffer.WriteString(fmt.Sprintf("CC: %s\r\n", m.CC))
 	}
 	if m.Subject != "" {
-		m.buffer.WriteString(fmt.Sprintf("Subject: %s\n", m.Subject))
+		m.buffer.WriteString(fmt.Sprintf("Subject: %s\r\n", m.Subject))
 	}
 	// Extra
 	for k, v := range e.Header {
-		m.buffer.WriteString(fmt.Sprintf("%s: %s\n", k, v))
+		m.buffer.WriteString(fmt.Sprintf("%s: %s\r\n", k, v))
 	}
-	m.buffer.WriteString(fmt.Sprintf("Content-Type: multipart/mixed; boundary=%s\n", m.boundary))
-	m.buffer.WriteString("\n")
+	m.buffer.WriteString(fmt.Sprintf("Content-Type: multipart/mixed; boundary=%s\r\n", m.boundary))
+	m.buffer.WriteString("\r\n")
 
 	// Message body
 	if m.Text != "" {
@@ -106,7 +106,7 @@ func (e *Email) Send(m *Message) (err error) {
 	for _, f := range m.Attachments {
 		m.writeFile(f, "disposition")
 	}
-	m.buffer.WriteString("\n")
+	m.buffer.WriteString("\r\n")
 	m.buffer.WriteString("--" + m.boundary + "--")
 
 	// Dial
