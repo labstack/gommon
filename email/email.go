@@ -73,7 +73,7 @@ func (e *Email) Send(m *Message) (err error) {
 	m.buffer = new(bytes.Buffer)
 	m.boundary = random.String(16)
 	m.buffer.WriteString("MIME-Version: 1.0\r\n")
-	m.buffer.WriteString(fmt.Sprintf("Message-Id: %s\r\n", m.ID))
+	m.buffer.WriteString(fmt.Sprintf("Message-ID: %s\r\n", m.ID))
 	m.buffer.WriteString(fmt.Sprintf("Date: %s\r\n", time.Now().Format(time.RFC1123Z)))
 	m.buffer.WriteString(fmt.Sprintf("From: %s\r\n", m.From))
 	m.buffer.WriteString(fmt.Sprintf("To: %s\r\n", m.To))
