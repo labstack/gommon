@@ -23,15 +23,15 @@ type (
 	}
 
 	Message struct {
-		ID          string
-		From        string
-		To          string
-		CC          string
-		Subject     string
-		Text        string
-		HTML        string
-		Inlines     []*File
-		Attachments []*File
+		ID          string  `json:"id"`
+		From        string  `json:"from"`
+		To          string  `json:"to"`
+		CC          string  `json:"cc"`
+		Subject     string  `json:"subject"`
+		Text        string  `json:"text"`
+		HTML        string  `json:"html"`
+		Inlines     []*File `json:"inlines"`
+		Attachments []*File `json:"attachments"`
 		buffer      *bytes.Buffer
 		boundary    string
 	}
