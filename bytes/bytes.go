@@ -2,8 +2,8 @@ package bytes
 
 import (
 	"fmt"
-	"regexp"
 	"strconv"
+	"unicode"
 )
 
 type (
@@ -22,8 +22,7 @@ const (
 )
 
 var (
-	pattern = regexp.MustCompile(`(?i)^(-?\d+)([KMGTP]B?|B)$`)
-	global  = New()
+	global = New()
 )
 
 // New creates a Bytes instance.
@@ -43,9 +42,6 @@ func (*Bytes) Format(b int64) string {
 	case b < MB:
 		value /= KB
 		multiple = "KB"
-	case b < MB:
-		value /= KB
-		multiple = "KB"
 	case b < GB:
 		value /= MB
 		multiple = "MB"
@@ -59,40 +55,39 @@ func (*Bytes) Format(b int64) string {
 		value /= PB
 		multiple = "PB"
 	}
-
-	return fmt.Sprintf("%.02f%s", value, multiple)
+	return strconv.FormatFloat(value, 'f', 2, 64) + multiple
 }
 
 // Parse parses human readable bytes string to bytes integer.
 // For example, 6GB (6G is also valid) will return 6442450944.
-func (*Bytes) Parse(value string) (i int64, err error) {
-	parts := pattern.FindStringSubmatch(value)
-	if len(parts) < 3 {
-		return 0, fmt.Errorf("error parsing value=%s", value)
-	}
-	bytesString := parts[1]
-	multiple := parts[2]
-	bytes, err := strconv.ParseInt(bytesString, 10, 64)
-	if err != nil {
-		return
+func (*Bytes) Parse(value string) (int64, error) {
+	for i, s := range value {
+		if unicode.IsLetter(s) {
+			bytesString, multiple := value[:i], value[i:]
+
+			bytes, err := strconv.ParseInt(bytesString, 10, 64)
+			if err != nil {
+				return 0, err
+			}
+
+			switch multiple {
+			case "B":
+				return bytes * B, nil
+			case "K", "KB":
+				return bytes * KB, nil
+			case "M", "MB":
+				return bytes * MB, nil
+			case "G", "GB":
+				return bytes * GB, nil
+			case "T", "TB":
+				return bytes * TB, nil
+			case "P", "PB":
+				return bytes * PB, nil
+			}
+		}
 	}
 
-	switch multiple {
-	case "B":
-		return bytes * B, nil
-	case "K", "KB":
-		return bytes * KB, nil
-	case "M", "MB":
-		return bytes * MB, nil
-	case "G", "GB":
-		return bytes * GB, nil
-	case "T", "TB":
-		return bytes * TB, nil
-	case "P", "PB":
-		return bytes * PB, nil
-	}
-
-	return
+	return 0, fmt.Errorf("error parsing value=%s", value)
 }
 
 // Format wraps global Bytes's Format function.

@@ -1,9 +1,8 @@
 package bytes
 
 import (
-	"testing"
-
 	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func TestBytesFormat(t *testing.T) {
@@ -87,5 +86,17 @@ func TestBytesParse(t *testing.T) {
 	b, err = Parse("9P")
 	if assert.NoError(t, err) {
 		assert.Equal(t, int64(10133099161583616), b)
+	}
+}
+
+func BenchmarkBytes_Format(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		Format(7323232398434)
+	}
+}
+
+func BenchmarkBytes_Parse(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		Parse("90000PB")
 	}
 }
