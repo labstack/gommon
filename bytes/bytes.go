@@ -7,11 +7,12 @@ import (
 )
 
 type (
+	// Bytes struct
 	Bytes struct{}
 )
 
 const (
-	B = 1 << (10 * iota)
+	_ = 1.0 << (10 * iota) // ignore first value by assigning to blank identifier
 	KB
 	MB
 	GB
@@ -21,7 +22,7 @@ const (
 )
 
 var (
-	pattern = regexp.MustCompile(`(?i)^(-?\d+)([KMGTP]B?|B)$`)
+	pattern = regexp.MustCompile(`(?i)^(-?\d+(?:\.\d+)?)([KMGTPE]B?|B?)$`)
 	global  = New()
 )
 
@@ -73,27 +74,27 @@ func (*Bytes) Parse(value string) (i int64, err error) {
 	}
 	bytesString := parts[1]
 	multiple := parts[2]
-	bytes, err := strconv.ParseInt(bytesString, 10, 64)
+	bytes, err := strconv.ParseFloat(bytesString, 64)
 	if err != nil {
 		return
 	}
 
 	switch multiple {
-	case "B":
-		return bytes * B, nil
+	default:
+		return int64(bytes), nil
 	case "K", "KB":
-		return bytes * KB, nil
+		return int64(bytes * KB), nil
 	case "M", "MB":
-		return bytes * MB, nil
+		return int64(bytes * MB), nil
 	case "G", "GB":
-		return bytes * GB, nil
+		return int64(bytes * GB), nil
 	case "T", "TB":
-		return bytes * TB, nil
+		return int64(bytes * TB), nil
 	case "P", "PB":
-		return bytes * PB, nil
+		return int64(bytes * PB), nil
+	case "E", "EB":
+		return int64(bytes * EB), nil
 	}
-
-	return
 }
 
 // Format wraps global Bytes's Format function.
