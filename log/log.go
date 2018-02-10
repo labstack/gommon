@@ -8,10 +8,9 @@ import (
 	"os"
 	"path"
 	"runtime"
+	"strconv"
 	"sync"
 	"time"
-
-	"strconv"
 
 	"github.com/mattn/go-isatty"
 	"github.com/valyala/fasttemplate"

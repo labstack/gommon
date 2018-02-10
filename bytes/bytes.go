@@ -7,8 +7,7 @@ import (
 )
 
 type (
-	Bytes struct {
-	}
+	Bytes struct{}
 )
 
 const (
@@ -38,29 +37,31 @@ func (*Bytes) Format(b int64) string {
 	value := float64(b)
 
 	switch {
-	case b < KB:
-		return strconv.FormatInt(b, 10) + "B"
-	case b < MB:
-		value /= KB
-		multiple = "KB"
-	case b < MB:
-		value /= KB
-		multiple = "KB"
-	case b < GB:
-		value /= MB
-		multiple = "MB"
-	case b < TB:
-		value /= GB
-		multiple = "GB"
-	case b < PB:
-		value /= TB
-		multiple = "TB"
-	case b < EB:
+	case b >= EB:
+		value /= EB
+		multiple = "EB"
+	case b >= PB:
 		value /= PB
 		multiple = "PB"
+	case b >= TB:
+		value /= TB
+		multiple = "TB"
+	case b >= GB:
+		value /= GB
+		multiple = "GB"
+	case b >= MB:
+		value /= MB
+		multiple = "MB"
+	case b >= KB:
+		value /= KB
+		multiple = "KB"
+	case b == 0:
+		return "0"
+	default:
+		return strconv.FormatInt(b, 10) + "B"
 	}
 
-	return fmt.Sprintf("%.02f%s", value, multiple)
+	return fmt.Sprintf("%.2f%s", value, multiple)
 }
 
 // Parse parses human readable bytes string to bytes integer.
