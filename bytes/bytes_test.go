@@ -47,6 +47,26 @@ func TestBytesParseErrors(t *testing.T) {
 	}
 }
 
+func TestFloats(t *testing.T) {
+	// From string:
+	str := "12.25KB"
+	value, err := Parse(str)
+	assert.NoError(t, err)
+	assert.Equal(t, int64(12544), value)
+
+	str2 := Format(value)
+	assert.Equal(t, str, str2)
+
+	// To string:
+	val := int64(13233029)
+	str = Format(val)
+	assert.Equal(t, "12.62MB", str)
+
+	val2, err := Parse(str)
+	assert.NoError(t, err)
+	assert.Equal(t, val, val2)
+}
+
 func TestBytesParse(t *testing.T) {
 	// B
 	b, err := Parse("999")
