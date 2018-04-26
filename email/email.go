@@ -26,8 +26,8 @@ type (
 		To          string  `json:"to"`
 		CC          string  `json:"cc"`
 		Subject     string  `json:"subject"`
-		Text        string  `json:"text"`
-		HTML        string  `json:"html"`
+		BodyText    string  `json:"body_text"`
+		BodyHTML    string  `json:"body_html"`
 		Inlines     []*File `json:"inlines"`
 		Attachments []*File `json:"attachments"`
 		buffer      *bytes.Buffer
@@ -105,10 +105,10 @@ func (e *Email) Send(m *Message) (err error) {
 	m.buffer.WriteString("\r\n")
 
 	// Message body
-	if m.Text != "" {
-		m.writeText(m.Text, "text/plain")
-	} else if m.HTML != "" {
-		m.writeText(m.HTML, "text/html")
+	if m.BodyText != "" {
+		m.writeText(m.BodyText, "text/plain")
+	} else if m.BodyHTML != "" {
+		m.writeText(m.BodyHTML, "text/html")
 	} else {
 		// TODO:
 	}
