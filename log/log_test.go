@@ -2,6 +2,7 @@ package log
 
 import (
 	"bytes"
+	"fmt"
 	"os"
 	"os/exec"
 	"sync"
@@ -37,6 +38,10 @@ func test(l *Logger, t *testing.T) {
 	assert.Contains(t, b.String(), `"message":"warn"`)
 	assert.Contains(t, b.String(), `"level":"ERROR","prefix":"`+l.prefix+`"`)
 	assert.Contains(t, b.String(), `"message":"errorf"`)
+
+	if testing.Verbose() {
+		fmt.Println(b.String())
+	}
 }
 
 func TestLog(t *testing.T) {
@@ -45,7 +50,36 @@ func TestLog(t *testing.T) {
 }
 
 func TestGlobal(t *testing.T) {
-	test(global, t)
+	b := new(bytes.Buffer)
+	global.SetOutput(b)
+	global.DisableColor()
+	global.SetLevel(WARN)
+
+	Print("print")
+	Printf("print%s", "f")
+	Debug("debug")
+	Debugf("debug%s", "f")
+	Info("info")
+	Infof("info%s", "f")
+	Warn("warn")
+	Warnf("warn%s", "f")
+	Error("error")
+	Errorf("error%s", "f")
+
+	assert.Contains(t, b.String(), `"file":"log_test.go","line":"58","message":"print"`)
+	assert.Contains(t, b.String(), `"file":"log_test.go","line":"59","message":"printf"`)
+	assert.Contains(t, b.String(), `"file":"log_test.go","line":"64","message":"warn"`)
+	assert.Contains(t, b.String(), `"file":"log_test.go","line":"65","message":"warnf"`)
+	assert.Contains(t, b.String(), `"file":"log_test.go","line":"66","message":"error"`)
+	assert.Contains(t, b.String(), `"file":"log_test.go","line":"67","message":"errorf"`)
+	assert.Contains(t, b.String(), `"level":"WARN","prefix":"`+global.prefix+`"`)
+	assert.Contains(t, b.String(), `"message":"warn"`)
+	assert.Contains(t, b.String(), `"level":"ERROR","prefix":"`+global.prefix+`"`)
+	assert.Contains(t, b.String(), `"message":"errorf"`)
+
+	if testing.Verbose() {
+		fmt.Println(b.String())
+	}
 }
 
 func TestLogConcurrent(t *testing.T) {
