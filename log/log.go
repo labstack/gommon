@@ -12,7 +12,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/mattn/go-isatty"
+	isatty "github.com/mattn/go-isatty"
 	"github.com/valyala/fasttemplate"
 
 	"github.com/labstack/gommon/color"
@@ -28,6 +28,8 @@ type (
 		color      *color.Color
 		bufferPool sync.Pool
 		mutex      sync.Mutex
+
+		global bool
 	}
 
 	Lvl uint8
@@ -50,6 +52,10 @@ var (
 	defaultHeader = `{"time":"${time_rfc3339_nano}","level":"${level}","prefix":"${prefix}",` +
 		`"file":"${short_file}","line":"${line}"}`
 )
+
+func init() {
+	global.global = true
+}
 
 func New(prefix string) (l *Logger) {
 	l = &Logger{
@@ -347,7 +353,13 @@ func (l *Logger) log(v Lvl, format string, args ...interface{}) {
 	buf := l.bufferPool.Get().(*bytes.Buffer)
 	buf.Reset()
 	defer l.bufferPool.Put(buf)
-	_, file, line, _ := runtime.Caller(2)
+
+	var file, line = "", 0
+	if l.global {
+		_, file, line, _ = runtime.Caller(3)
+	} else {
+		_, file, line, _ = runtime.Caller(2)
+	}
 
 	if v >= l.level || v == 0 {
 		message := ""
