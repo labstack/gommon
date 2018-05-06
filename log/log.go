@@ -22,6 +22,7 @@ type (
 	Logger struct {
 		prefix     string
 		level      Lvl
+		skip       int
 		output     io.Writer
 		template   *fasttemplate.Template
 		levels     []string
@@ -51,9 +52,14 @@ var (
 		`"file":"${short_file}","line":"${line}"}`
 )
 
+func init() {
+	global.skip = 3
+}
+
 func New(prefix string) (l *Logger) {
 	l = &Logger{
 		level:    INFO,
+		skip:     2,
 		prefix:   prefix,
 		template: l.newTemplate(defaultHeader),
 		color:    color.New(),
@@ -347,7 +353,7 @@ func (l *Logger) log(v Lvl, format string, args ...interface{}) {
 	buf := l.bufferPool.Get().(*bytes.Buffer)
 	buf.Reset()
 	defer l.bufferPool.Put(buf)
-	_, file, line, _ := runtime.Caller(2)
+	_, file, line, _ := runtime.Caller(l.skip)
 
 	if v >= l.level || v == 0 {
 		message := ""
