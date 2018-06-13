@@ -110,7 +110,7 @@ func (e *Email) Send(m *Message) (err error) {
 	} else if m.BodyHTML != "" {
 		m.writeText(m.BodyHTML, "text/html")
 	} else {
-		// TODO:
+		m.writeBoundary()
 	}
 
 	// Inlines/attachments
