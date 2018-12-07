@@ -110,6 +110,17 @@ func TestJSON(t *testing.T) {
 	assert.Contains(t, b.String(), `"name":"value"`)
 }
 
+func TestJSONIndent(t *testing.T) {
+	l := New("test")
+	b := new(bytes.Buffer)
+	l.SetOutput(b)
+	l.SetLevel(DEBUG)
+	l.SetHeader("")
+	l.SetIndent("  ")
+	l.Debugj(JSON{"name": "value"})
+	assert.Contains(t, b.String(), "xxx {\n  \"name\": \"value\"\n}\n")
+}
+
 func TestStringWithQuotes(t *testing.T) {
 	l := New("test")
 	b := new(bytes.Buffer)
