@@ -32,6 +32,8 @@ type (
 		mutex      sync.Mutex
 	}
 
+	Lvl uint8
+
 	JSON map[string]interface{}
 )
 
@@ -108,12 +110,12 @@ func (l *Logger) SetPrefix(p string) {
 	l.prefix = p
 }
 
-func (l *Logger) Level() uint32 {
-	return atomic.LoadUint32(&l.level)
+func (l *Logger) Level() Lvl {
+	return Lvl(atomic.LoadUint32(&l.level))
 }
 
-func (l *Logger) SetLevel(level uint32) {
-	atomic.StoreUint32(&l.level, level)
+func (l *Logger) SetLevel(level Lvl) {
+	atomic.StoreUint32(&l.level, uint32(level))
 }
 
 func (l *Logger) Output() io.Writer {
@@ -242,11 +244,11 @@ func SetPrefix(p string) {
 	global.SetPrefix(p)
 }
 
-func Level() uint32 {
+func Level() Lvl {
 	return global.Level()
 }
 
-func SetLevel(level uint32) {
+func SetLevel(level Lvl) {
 	global.SetLevel(level)
 }
 
