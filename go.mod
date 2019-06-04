@@ -1,14 +1,12 @@
 module github.com/labstack/gommon
 
 require (
-	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/mattn/go-colorable v0.0.9
-	github.com/mattn/go-isatty v0.0.4
-	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/stretchr/testify v1.2.2
-	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	github.com/valyala/fasttemplate v0.0.0-20170224212429-dcecefd839c4
-	golang.org/x/sys v0.0.0-20190531175056-4c3a928424d2 // indirect
+	github.com/mattn/go-colorable v0.1.2
+	github.com/mattn/go-isatty v0.0.8
+	github.com/stretchr/objx v0.2.0 // indirect
+	github.com/stretchr/testify v1.3.0
+	github.com/valyala/fasttemplate v1.0.1
+	golang.org/x/sys v0.0.0-20190602015325-4c4f7f33c9ed // indirect
 )
 
 go 1.13
