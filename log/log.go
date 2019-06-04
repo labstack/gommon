@@ -38,7 +38,7 @@ type (
 )
 
 const (
-	DEBUG uint32 = iota + 1
+	DEBUG Lvl = iota + 1
 	INFO
 	WARN
 	ERROR
@@ -59,7 +59,7 @@ func init() {
 
 func New(prefix string) (l *Logger) {
 	l = &Logger{
-		level:    INFO,
+		level:    uint32(INFO),
 		skip:     2,
 		prefix:   prefix,
 		template: l.newTemplate(defaultHeader),
@@ -348,8 +348,8 @@ func Panicj(j JSON) {
 	global.Panicj(j)
 }
 
-func (l *Logger) log(level uint32, format string, args ...interface{}) {
-	if level >= l.level || level == 0 {
+func (l *Logger) log(level Lvl, format string, args ...interface{}) {
+	if level >= l.Level() || level == 0 {
 		buf := l.bufferPool.Get().(*bytes.Buffer)
 		buf.Reset()
 		defer l.bufferPool.Put(buf)
