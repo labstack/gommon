@@ -20,15 +20,17 @@ import (
 
 type (
 	Logger struct {
-		prefix     string
-		level      Lvl
-		skip       int
-		output     io.Writer
-		template   *fasttemplate.Template
-		levels     []string
-		color      *color.Color
-		bufferPool sync.Pool
-		mutex      sync.Mutex
+		prefix        string
+		level         Lvl
+		skip          int
+		output        io.Writer
+		template      *fasttemplate.Template
+		levels        []string
+		color         *color.Color
+		bufferPool    sync.Pool
+		mutex         sync.Mutex
+		indentEnabled bool
+		indent        string
 	}
 
 	Lvl uint8
@@ -96,6 +98,10 @@ func (l *Logger) DisableColor() {
 	l.initLevels()
 }
 
+func (l *Logger) DisableIndent() {
+	l.indentEnabled = false
+}
+
 func (l *Logger) EnableColor() {
 	l.color.Enable()
 	l.initLevels()
@@ -107,6 +113,11 @@ func (l *Logger) Prefix() string {
 
 func (l *Logger) SetPrefix(p string) {
 	l.prefix = p
+}
+
+func (l *Logger) SetIndent(i string) {
+	l.indentEnabled = true
+	l.indent = i
 }
 
 func (l *Logger) Level() Lvl {
@@ -360,9 +371,18 @@ func (l *Logger) log(v Lvl, format string, args ...interface{}) {
 		if format == "" {
 			message = fmt.Sprint(args...)
 		} else if format == "json" {
-			b, err := json.Marshal(args[0])
-			if err != nil {
-				panic(err)
+			var b []byte
+			var err error
+			if l.indentEnabled {
+				b, err = json.MarshalIndent(args[0], "", l.indent)
+				if err != nil {
+					panic(err)
+				}
+			} else {
+				b, err = json.Marshal(args[0])
+				if err != nil {
+					panic(err)
+				}
 			}
 			message = string(b)
 		} else {
@@ -392,7 +412,10 @@ func (l *Logger) log(v Lvl, format string, args ...interface{}) {
 		if err == nil {
 			s := buf.String()
 			i := buf.Len() - 1
-			if s[i] == '}' {
+			if i == -1 {
+				// Empty header
+				buf.WriteString(message)
+			} else if s[i] == '}' {
 				// JSON header
 				buf.Truncate(i)
 				buf.WriteByte(',')
