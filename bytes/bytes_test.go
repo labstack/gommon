@@ -106,6 +106,21 @@ func TestBytesParse(t *testing.T) {
 		assert.Equal(t, int64(12288), b)
 	}
 
+	// kb, lowercase multiple test
+	b, err = Parse("12.25kb")
+	if assert.NoError(t, err) {
+		assert.Equal(t, int64(12544), b)
+	}
+	b, err = Parse("12kb")
+	if assert.NoError(t, err) {
+		assert.Equal(t, int64(12288), b)
+	}
+	b, err = Parse("12k")
+	if assert.NoError(t, err) {
+		assert.Equal(t, int64(12288), b)
+	}
+
+
 	// KB with space
 	b, err = Parse("12.25 KB")
 	if assert.NoError(t, err) {
