@@ -1,9 +1,9 @@
 package random
 
 import (
-	"math/rand"
+	"bufio"
+	"crypto/rand"
 	"strings"
-	"time"
 )
 
 type (
@@ -27,7 +27,6 @@ var (
 )
 
 func New() *Random {
-	rand.Seed(time.Now().UnixNano())
 	return new(Random)
 }
 
@@ -36,11 +35,16 @@ func (r *Random) String(length uint8, charsets ...string) string {
 	if charset == "" {
 		charset = Alphanumeric
 	}
-	b := make([]byte, length)
-	for i := range b {
-		b[i] = charset[rand.Int63()%int64(len(charset))]
+	reader := bufio.NewReaderSize(rand.Reader, int(length))
+	buf := make([]byte, length)
+	for i := range buf {
+		b, err := reader.ReadByte()
+		if err != nil {
+			panic(err)
+		}
+		buf[i] = charset[int(b)%len(charset)]
 	}
-	return string(b)
+	return string(buf)
 }
 
 func String(length uint8, charsets ...string) string {
