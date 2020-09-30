@@ -14,8 +14,8 @@ Try [cmder](http://bliker.github.io/cmder) or https://github.com/mattn/go-colora
 
 ## [Usage](https://github.com/labstack/gommon/blob/master/color/color_test.go)
 
-```sh
-import github.com/labstack/gommon/color
+```go
+import "github.com/labstack/gommon/color"
 ```
 
 ### Colored text
