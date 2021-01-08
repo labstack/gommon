@@ -348,6 +348,10 @@ func Panicj(j JSON) {
 	global.Panicj(j)
 }
 
+func SetSkip(amount int) {
+	global.skip = amount
+}
+
 func (l *Logger) log(level Lvl, format string, args ...interface{}) {
 	if level >= l.Level() || level == 0 {
 		buf := l.bufferPool.Get().(*bytes.Buffer)
