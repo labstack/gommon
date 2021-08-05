@@ -10,21 +10,43 @@ import (
 type (
 	// Bytes struct
 	Bytes struct{}
+
+	// PrefixType is the type of the unit prefix (binary/decimal)
+	PrefixType byte
 )
 
 const (
+	// IEC 60027
+	PrefixTypeBinary PrefixType = iota
+	// SI international system of units
+	PrefixTypeDecimal
+)
+
+// binary units (IEC 60027)
+const (
 	_ = 1.0 << (10 * iota) // ignore first value by assigning to blank identifier
-	KB
-	MB
-	GB
-	TB
-	PB
-	EB
+	KiB
+	MiB
+	GiB
+	TiB
+	PiB
+	EiB
+)
+
+// decimal units (SI international system of units)
+const (
+	KB = 1000
+	MB = KB * 1000
+	GB = MB * 1000
+	TB = GB * 1000
+	PB = TB * 1000
+	EB = PB * 1000
 )
 
 var (
-	pattern = regexp.MustCompile(`(?i)^(-?\d+(?:\.\d+)?)\s?([KMGTPE]B?|B?)$`)
-	global  = New()
+	patternBinary  = regexp.MustCompile(`(?i)^(-?\d+(?:\.\d+)?)\s?([KMGTPE]iB?)$`)
+	patternDecimal = regexp.MustCompile(`(?i)^(-?\d+(?:\.\d+)?)\s?([KMGTPE]B?|B?)$`)
+	global         = New()
 )
 
 // New creates a Bytes instance.
@@ -32,44 +54,107 @@ func New() *Bytes {
 	return &Bytes{}
 }
 
-// Format formats bytes integer to human readable string.
-// For example, 31323 bytes will return 30.59KB.
-func (*Bytes) Format(b int64) string {
-	multiple := ""
-	value := float64(b)
+// Format formats bytes integer to human readable string according to the given prefix type.
+// If prefixType is not passed, binary prefix is used.
+func (b *Bytes) Format(value int64, prefixType ...PrefixType) string {
 
-	switch {
-	case b >= EB:
-		value /= EB
-		multiple = "EB"
-	case b >= PB:
-		value /= PB
-		multiple = "PB"
-	case b >= TB:
-		value /= TB
-		multiple = "TB"
-	case b >= GB:
-		value /= GB
-		multiple = "GB"
-	case b >= MB:
-		value /= MB
-		multiple = "MB"
-	case b >= KB:
-		value /= KB
-		multiple = "KB"
-	case b == 0:
-		return "0"
-	default:
-		return strconv.FormatInt(b, 10) + "B"
+	if len(prefixType) > 0 {
+		switch prefixType[0] {
+		case PrefixTypeBinary:
+			return b.FormatBinary(value)
+		case PrefixTypeDecimal:
+			return b.FormatDecimal(value)
+		}
 	}
 
-	return fmt.Sprintf("%.2f%s", value, multiple)
+	return b.FormatBinary(value)
+}
+
+// FormatBinary formats bytes integer to human readable string according to IEC 60027.
+// For example, 31323 bytes will return 30.59KB.
+func (*Bytes) FormatBinary(value int64) string {
+	multiple := ""
+	val := float64(value)
+
+	switch {
+	case value >= EiB:
+		val /= EiB
+		multiple = "EiB"
+	case value >= PiB:
+		val /= PiB
+		multiple = "PiB"
+	case value >= TiB:
+		val /= TiB
+		multiple = "TiB"
+	case value >= GiB:
+		val /= GiB
+		multiple = "GiB"
+	case value >= MiB:
+		val /= MiB
+		multiple = "MiB"
+	case value >= KiB:
+		val /= KiB
+		multiple = "KiB"
+	case value == 0:
+		return "0"
+	default:
+		return strconv.FormatInt(value, 10) + "B"
+	}
+
+	return fmt.Sprintf("%.2f%s", val, multiple)
+}
+
+// FormatDecimal formats bytes integer to human readable string according to SI international system of units.
+// For example, 31323 bytes will return 31.32KB.
+func (*Bytes) FormatDecimal(value int64) string {
+	multiple := ""
+	val := float64(value)
+
+	switch {
+	case value >= EB:
+		val /= EB
+		multiple = "EB"
+	case value >= PB:
+		val /= PB
+		multiple = "PB"
+	case value >= TB:
+		val /= TB
+		multiple = "TB"
+	case value >= GB:
+		val /= GB
+		multiple = "GB"
+	case value >= MB:
+		val /= MB
+		multiple = "MB"
+	case value >= KB:
+		val /= KB
+		multiple = "KB"
+	case value == 0:
+		return "0"
+	default:
+		return strconv.FormatInt(value, 10) + "B"
+	}
+
+	return fmt.Sprintf("%.2f%s", val, multiple)
 }
 
 // Parse parses human readable bytes string to bytes integer.
-// For example, 6GB (6G is also valid) will return 6442450944.
-func (*Bytes) Parse(value string) (i int64, err error) {
-	parts := pattern.FindStringSubmatch(value)
+// For example, 6GiB (6Gi is also valid) will return 6442450944, and
+// 6GB (6G is also valid) will return 6000000000.
+func (b *Bytes) Parse(value string) (int64, error) {
+
+	i, err := b.ParseBinary(value)
+	if err == nil {
+		return i, err
+	}
+
+	return b.ParseDecimal(value)
+}
+
+// ParseBinary parses human readable bytes string to bytes integer.
+// For example, 6GiB (6Gi is also valid) will return 6442450944.
+func (*Bytes) ParseBinary(value string) (i int64, err error) {
+	parts := patternBinary.FindStringSubmatch(value)
 	if len(parts) < 3 {
 		return 0, fmt.Errorf("error parsing value=%s", value)
 	}
@@ -81,8 +166,38 @@ func (*Bytes) Parse(value string) (i int64, err error) {
 	}
 
 	switch multiple {
+	case "KI", "KIB":
+		return int64(bytes * KiB), nil
+	case "MI", "MIB":
+		return int64(bytes * MiB), nil
+	case "GI", "GIB":
+		return int64(bytes * GiB), nil
+	case "TI", "TIB":
+		return int64(bytes * TiB), nil
+	case "PI", "PIB":
+		return int64(bytes * PiB), nil
+	case "EI", "EIB":
+		return int64(bytes * EiB), nil
 	default:
 		return int64(bytes), nil
+	}
+}
+
+// ParseDecimal parses human readable bytes string to bytes integer.
+// For example, 6GB (6G is also valid) will return 6000000000.
+func (*Bytes) ParseDecimal(value string) (i int64, err error) {
+	parts := patternDecimal.FindStringSubmatch(value)
+	if len(parts) < 3 {
+		return 0, fmt.Errorf("error parsing value=%s", value)
+	}
+	bytesString := parts[1]
+	multiple := strings.ToUpper(parts[2])
+	bytes, err := strconv.ParseFloat(bytesString, 64)
+	if err != nil {
+		return
+	}
+
+	switch multiple {
 	case "K", "KB":
 		return int64(bytes * KB), nil
 	case "M", "MB":
@@ -95,15 +210,27 @@ func (*Bytes) Parse(value string) (i int64, err error) {
 		return int64(bytes * PB), nil
 	case "E", "EB":
 		return int64(bytes * EB), nil
+	default:
+		return int64(bytes), nil
 	}
 }
 
 // Format wraps global Bytes's Format function.
-func Format(b int64) string {
-	return global.Format(b)
+func Format(value int64, prefixType ...PrefixType) string {
+	return global.Format(value, prefixType...)
+}
+
+// FormatBinary wraps global Bytes's FormatBinary function.
+func FormatBinary(value int64) string {
+	return global.FormatBinary(value)
+}
+
+// FormatDecimal wraps global Bytes's FormatDecimal function.
+func FormatDecimal(value int64) string {
+	return global.FormatDecimal(value)
 }
 
 // Parse wraps global Bytes's Parse function.
-func Parse(val string) (int64, error) {
-	return global.Parse(val)
+func Parse(value string) (int64, error) {
+	return global.Parse(value)
 }
