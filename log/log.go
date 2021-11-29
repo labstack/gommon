@@ -119,10 +119,16 @@ func (l *Logger) SetLevel(level Lvl) {
 }
 
 func (l *Logger) Output() io.Writer {
+	l.mutex.Lock()
+	defer l.mutex.Unlock()
+
 	return l.output
 }
 
 func (l *Logger) SetOutput(w io.Writer) {
+	l.mutex.Lock()
+	defer l.mutex.Unlock()
+
 	l.output = w
 	if w, ok := w.(*os.File); !ok || !isatty.IsTerminal(w.Fd()) {
 		l.DisableColor()
