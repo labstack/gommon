@@ -379,6 +379,8 @@ func (l *Logger) log(level Lvl, format string, args ...interface{}) {
 			case "time_rfc3339_nano":
 				return w.Write([]byte(time.Now().Format(time.RFC3339Nano)))
 			case "level":
+				l.mutex.Lock() // Needed here because initLevels() is called during SetOutput().
+				defer l.mutex.Unlock()
 				return w.Write([]byte(l.levels[level]))
 			case "prefix":
 				return w.Write([]byte(l.prefix))
