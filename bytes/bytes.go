@@ -10,16 +10,6 @@ import (
 type (
 	// Bytes struct
 	Bytes struct{}
-
-	// PrefixType is the type of the unit prefix (binary/decimal)
-	PrefixType byte
-)
-
-const (
-	// IEC 60027
-	PrefixTypeBinary PrefixType = iota
-	// SI international system of units
-	PrefixTypeDecimal
 )
 
 // binary units (IEC 60027)
@@ -54,19 +44,9 @@ func New() *Bytes {
 	return &Bytes{}
 }
 
-// Format formats bytes integer to human readable string according to the given prefix type.
-// If prefixType is not passed, binary prefix is used.
-func (b *Bytes) Format(value int64, prefixType ...PrefixType) string {
-
-	if len(prefixType) > 0 {
-		switch prefixType[0] {
-		case PrefixTypeBinary:
-			return b.FormatBinary(value)
-		case PrefixTypeDecimal:
-			return b.FormatDecimal(value)
-		}
-	}
-
+// Format formats bytes integer to human readable string according to IEC 60027.
+// For example, 31323 bytes will return 30.59KB.
+func (b *Bytes) Format(value int64) string {
 	return b.FormatBinary(value)
 }
 
@@ -216,8 +196,8 @@ func (*Bytes) ParseDecimal(value string) (i int64, err error) {
 }
 
 // Format wraps global Bytes's Format function.
-func Format(value int64, prefixType ...PrefixType) string {
-	return global.Format(value, prefixType...)
+func Format(value int64) string {
+	return global.Format(value)
 }
 
 // FormatBinary wraps global Bytes's FormatBinary function.
