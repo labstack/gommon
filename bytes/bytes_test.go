@@ -40,27 +40,27 @@ func TestBytesFormat(t *testing.T) {
 	assert.Equal(t, "8.00EiB", b)
 
 	// KB
-	b = Format(31323, PrefixTypeDecimal)
+	b = FormatDecimal(31323)
 	assert.Equal(t, "31.32KB", b)
 
 	// MB
-	b = Format(13231323, PrefixTypeDecimal)
+	b = FormatDecimal(13231323)
 	assert.Equal(t, "13.23MB", b)
 
 	// GB
-	b = Format(7323232398, PrefixTypeDecimal)
+	b = FormatDecimal(7323232398)
 	assert.Equal(t, "7.32GB", b)
 
 	// TB
-	b = Format(7323232398434, PrefixTypeDecimal)
+	b = FormatDecimal(7323232398434)
 	assert.Equal(t, "7.32TB", b)
 
 	// PB
-	b = Format(9923232398434432, PrefixTypeDecimal)
+	b = FormatDecimal(9923232398434432)
 	assert.Equal(t, "9.92PB", b)
 
 	// EB
-	b = Format(math.MaxInt64, PrefixTypeDecimal)
+	b = FormatDecimal(math.MaxInt64)
 	assert.Equal(t, "9.22EB", b)
 }
 
@@ -96,12 +96,12 @@ func TestFloats(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, int64(12250), valueDec)
 
-	strDec2 := Format(valueDec, PrefixTypeDecimal)
+	strDec2 := FormatDecimal(valueDec)
 	assert.Equal(t, strDec, strDec2)
 
 	// To string decimal:
 	valDec := int64(13230000)
-	strDec = Format(valDec, PrefixTypeDecimal)
+	strDec = FormatDecimal(valDec)
 	assert.Equal(t, "13.23MB", strDec)
 
 	valDec2, err := Parse(strDec)
