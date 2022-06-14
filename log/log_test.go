@@ -119,6 +119,16 @@ func TestStringWithQuotes(t *testing.T) {
 	assert.Contains(t, b.String(), `"message":"Content-Type: \"\""`)
 }
 
+func TestEmptyHeader(t *testing.T) {
+	l := New("test")
+	b := new(bytes.Buffer)
+	l.SetOutput(b)
+	l.SetHeader("")
+	l.SetLevel(DEBUG)
+	l.Debugf("captain's log")
+	assert.Contains(t, b.String(), `captain's log`)
+}
+
 func BenchmarkLog(b *testing.B) {
 	l := New("test")
 	l.SetOutput(new(bytes.Buffer))
