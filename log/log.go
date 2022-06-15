@@ -119,10 +119,16 @@ func (l *Logger) SetLevel(level Lvl) {
 }
 
 func (l *Logger) Output() io.Writer {
+	l.mutex.Lock()
+	defer l.mutex.Unlock()
+
 	return l.output
 }
 
 func (l *Logger) SetOutput(w io.Writer) {
+	l.mutex.Lock()
+	defer l.mutex.Unlock()
+
 	l.output = w
 	if w, ok := w.(*os.File); !ok || !isatty.IsTerminal(w.Fd()) {
 		l.DisableColor()
@@ -348,6 +354,10 @@ func Panicj(j JSON) {
 	global.Panicj(j)
 }
 
+func SetSkip(amount int) {
+	global.skip = amount
+}
+
 func (l *Logger) log(level Lvl, format string, args ...interface{}) {
 	if level >= l.Level() || level == 0 {
 		buf := l.bufferPool.Get().(*bytes.Buffer)
@@ -375,6 +385,8 @@ func (l *Logger) log(level Lvl, format string, args ...interface{}) {
 			case "time_rfc3339_nano":
 				return w.Write([]byte(time.Now().Format(time.RFC3339Nano)))
 			case "level":
+				l.mutex.Lock() // Needed here because initLevels() is called during SetOutput().
+				defer l.mutex.Unlock()
 				return w.Write([]byte(l.levels[level]))
 			case "prefix":
 				return w.Write([]byte(l.prefix))
