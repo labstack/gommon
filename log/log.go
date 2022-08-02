@@ -109,10 +109,12 @@ func (l *Logger) SetPrefix(p string) {
 	l.prefix = p
 }
 
+//go:norace
 func (l *Logger) Level() Lvl {
 	return l.level
 }
 
+//go:norace
 func (l *Logger) SetLevel(level Lvl) {
 	l.level = level
 }
