@@ -10,7 +10,6 @@ import (
 	"runtime"
 	"strconv"
 	"sync"
-	"sync/atomic"
 	"time"
 
 	"github.com/mattn/go-isatty"
@@ -22,7 +21,7 @@ import (
 type (
 	Logger struct {
 		prefix     string
-		level      uint32
+		level      Lvl
 		skip       int
 		output     io.Writer
 		template   *fasttemplate.Template
@@ -59,7 +58,7 @@ func init() {
 
 func New(prefix string) (l *Logger) {
 	l = &Logger{
-		level:    uint32(INFO),
+		level:    INFO,
 		skip:     2,
 		prefix:   prefix,
 		template: l.newTemplate(defaultHeader),
@@ -111,11 +110,11 @@ func (l *Logger) SetPrefix(p string) {
 }
 
 func (l *Logger) Level() Lvl {
-	return Lvl(atomic.LoadUint32(&l.level))
+	return l.level
 }
 
 func (l *Logger) SetLevel(level Lvl) {
-	atomic.StoreUint32(&l.level, uint32(level))
+	l.level = level
 }
 
 func (l *Logger) Output() io.Writer {
