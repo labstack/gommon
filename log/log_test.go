@@ -2,6 +2,7 @@ package log
 
 import (
 	"bytes"
+	"errors"
 	"os"
 	"os/exec"
 	"sync"
@@ -73,6 +74,31 @@ func TestFatal(t *testing.T) {
 
 	loggerFatalTest(t, "fatal", "fatal")
 	loggerFatalTest(t, "fatalf", "fatal-f")
+}
+
+func TestParseLevel(t *testing.T) {
+	testCases := map[string]struct {
+		input       string
+		expectedLvl Lvl
+		expectedErr error
+	}{
+		"DEBUG":     {"DEBUG", DEBUG, nil},
+		"INFO":      {"INFO", INFO, nil},
+		"WARN":      {"WARN", WARN, nil},
+		"ERROR":     {"ERROR", ERROR, nil},
+		"OFF":       {"OFF", OFF, nil},
+		"lowercase": {"debug", DEBUG, nil},
+		"mixedcase": {"WaRn", WARN, nil},
+		"unknown":   {"UNKNOWN", 0, errors.New("not a valid log level: 'UNKNOWN'")},
+	}
+
+	for name, testCase := range testCases {
+		t.Run(name, func(t *testing.T) {
+			lvl, err := ParseLevel(testCase.input)
+			assert.Equal(t, testCase.expectedLvl, lvl)
+			assert.Equal(t, testCase.expectedErr, err)
+		})
+	}
 }
 
 func loggerFatalTest(t *testing.T, env string, contains string) {

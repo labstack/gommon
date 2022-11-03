@@ -9,6 +9,7 @@ import (
 	"path"
 	"runtime"
 	"strconv"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -246,6 +247,24 @@ func SetPrefix(p string) {
 
 func Level() Lvl {
 	return global.Level()
+}
+
+func ParseLevel(lvl string) (Lvl, error) {
+	switch strings.ToUpper(lvl) {
+	case "DEBUG":
+		return DEBUG, nil
+	case "INFO":
+		return INFO, nil
+	case "WARN":
+		return WARN, nil
+	case "ERROR":
+		return ERROR, nil
+	case "OFF":
+		return OFF, nil
+	}
+
+	var l Lvl
+	return l, fmt.Errorf("not a valid log level: '%s'", lvl)
 }
 
 func SetLevel(level Lvl) {
