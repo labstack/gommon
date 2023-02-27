@@ -19,6 +19,11 @@ on:
       - '_fixture/**'
       - '.github/**'
       - 'codecov.yml'
+  workflow_dispatch:
+
+env:
+  # run static analysis only with the latest Go version
+  LATEST_GO_VERSION: "1.20"
 
 jobs:
   test:
@@ -27,17 +32,17 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
         # Each major Go release is supported until there are two newer major releases. https://golang.org/doc/devel/release.html#policy
         # Echo tests with last four major releases
-        go: [1.14, 1.15, 1.16, 1.17]
+        go: ["1.17","1.18","1.19","1.20"]
     name: ${{ matrix.os }} @ Go ${{ matrix.go }}
     runs-on: ${{ matrix.os }}
     steps:
       - name: Set up Go ${{ matrix.go }}
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
         with:
           go-version: ${{ matrix.go }}
 
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: ${{ github.ref }}
 
@@ -46,7 +51,7 @@ jobs:
           go test -race --coverprofile=coverage.coverprofile --covermode=atomic ./...
 
       - name: Upload coverage to Codecov
-        if: success() && matrix.go == 1.17 && matrix.os == 'ubuntu-latest'
-        uses: codecov/codecov-action@v2
+        if: success() && matrix.go == env.LATEST_GO_VERSION && matrix.os == 'ubuntu-latest'
+        uses: codecov/codecov-action@v3
         with:
           fail_ci_if_error: false
