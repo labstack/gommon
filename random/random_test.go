@@ -12,3 +12,9 @@ func Test(t *testing.T) {
 	r := New()
 	assert.Regexp(t, regexp.MustCompile("[0-9]+$"), r.String(8, Numeric))
 }
+
+func BenchmarkRandomString(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		String(32, Alphanumeric)
+	}
+}
