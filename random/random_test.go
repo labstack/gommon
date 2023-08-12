@@ -1,6 +1,7 @@
 package random
 
 import (
+	"math/rand"
 	"regexp"
 	"testing"
 
@@ -10,8 +11,20 @@ import (
 func Test(t *testing.T) {
 	assert.Len(t, String(32), 32)
 	r := New()
-	want := r.String(8, Numeric)
-	assert.Regexp(t, regexp.MustCompile("[0-9]+$"), want)
+	assert.Regexp(t, regexp.MustCompile("[0-9]+$"), r.String(8, Numeric))
+}
+
+func TestRandomString(t *testing.T) {
+	r := New()
+	// overwrite initialized Source by New()
+	rand.Seed(1)
+
+	got := r.String(32, Alphanumeric)
+	str := "onrHFkSuohOf8IvDIjS5HUHTGvw8q5mt"
+
+	if got == str {
+		t.Errorf("want random string; got: %s\n", got)
+	}
 }
 
 func BenchmarkRandomString(b *testing.B) {
