@@ -57,8 +57,8 @@ func (r *Random) String(length uint8, charsets ...string) string {
 	var i uint8 = 0
 
 	// security note:
-	// we can't just simply do b[i]=randomStringCharset[rb%len(randomStringCharset)],
-	// for example, when len(charsets) is 52, and rb is [0, 255], 256 = 52 * 4 + 48.
+	// we can't just simply do b[i]=charset[rb%byte(charsetLen)],
+	// for example, when charsetLen is 52, and rb is [0, 255], 256 = 52 * 4 + 48.
 	// this will make the first 48 characters more possibly to be generated then others.
 	// so we have to skip bytes when rb > maxByte
 
