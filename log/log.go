@@ -365,7 +365,9 @@ func (l *Logger) log(level Lvl, message string, jsonBody bool) {
 	buf.Reset()
 	defer l.bufferPool.Put(buf)
 	// JSON callers route through an extra logJSON wrapper; account for
-	// that frame so runtime.Caller still lands on the user's code.
+	// that frame so runtime.Caller still lands on the user's code. Keep
+	// this in sync with logJSON — if the wrapper is ever inlined away
+	// or moved, drop the increment.
 	skip := l.skip
 	if jsonBody {
 		skip++

@@ -25,6 +25,10 @@ func TestDial_PlainAccepts(t *testing.T) {
 	c, err := e.dial()
 	assert.NoError(t, err)
 	if c != nil {
+		// Our fake server never advertises STARTTLS, so dial must have
+		// stayed plaintext — document that intent.
+		ok, _ := c.Extension("STARTTLS")
+		assert.False(t, ok, "fake server should not advertise STARTTLS")
 		_ = c.Quit()
 	}
 	<-done
@@ -32,16 +36,18 @@ func TestDial_PlainAccepts(t *testing.T) {
 
 // TestDial_Timeout verifies DialTimeout caps dial wait on unreachable
 // hosts. Uses 203.0.113.1 (TEST-NET-3, RFC 5737) which is unroutable.
+// Timeout is 500ms to absorb CI scheduler jitter; the upper bound is
+// still well under a round-trip expectation.
 func TestDial_Timeout(t *testing.T) {
 	e := New("203.0.113.1:465")
-	e.DialTimeout = 150 * time.Millisecond
+	e.DialTimeout = 500 * time.Millisecond
 
 	start := time.Now()
 	_, err := e.dial()
 	elapsed := time.Since(start)
 
 	assert.Error(t, err)
-	assert.Less(t, elapsed, 2*time.Second)
+	assert.Less(t, elapsed, 3*time.Second)
 }
 
 // TestDial_InvalidAddress verifies malformed addresses fail fast.

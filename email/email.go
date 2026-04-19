@@ -19,10 +19,13 @@ type (
 		Template *template.Template
 		// TLSConfig, when non-nil, is used for both implicit TLS (SMTPS)
 		// and STARTTLS. Callers that need a custom root pool or a
-		// specific server name should set this.
+		// specific ServerName should set this. The config is cloned per
+		// dial, so callers can reuse a single value across sends; they
+		// must not mutate it concurrently with an in-flight Send.
 		TLSConfig *tls.Config
-		// DialTimeout caps how long the initial connection waits.
-		// Zero means no caller-imposed timeout.
+		// DialTimeout caps the TCP (and, for SMTPS, TLS) connect phase.
+		// It does not bound the full SMTP conversation after the client
+		// is returned. Zero means no caller-imposed timeout.
 		DialTimeout time.Duration
 		smtpAddress string
 	}
@@ -131,8 +134,11 @@ func (e *Email) Send(m *Message) (err error) {
 	m.buffer.WriteString(m.boundary)
 	m.buffer.WriteString("--")
 
-	// Dial. Port 465 is SMTPS (implicit TLS) per IANA; everything else
-	// connects plaintext and upgrades via STARTTLS when advertised.
+	// Dial. Port 465 is SMTPS (implicit TLS) per IANA and always uses
+	// TLS. Other ports connect plaintext and opportunistically upgrade
+	// to STARTTLS only if the server advertises it — if the server
+	// doesn't, the connection stays in the clear. Operators that
+	// require TLS must use port 465.
 	c, err := e.dial()
 	if err != nil {
 		return
@@ -178,12 +184,15 @@ func (e *Email) dial() (*smtp.Client, error) {
 		return nil, err
 	}
 
-	tlsConfig := e.TLSConfig
-	if tlsConfig == nil {
+	// Always clone so we never mutate the caller's TLSConfig.
+	var tlsConfig *tls.Config
+	if e.TLSConfig == nil {
 		tlsConfig = &tls.Config{ServerName: host}
-	} else if tlsConfig.ServerName == "" {
-		tlsConfig = tlsConfig.Clone()
-		tlsConfig.ServerName = host
+	} else {
+		tlsConfig = e.TLSConfig.Clone()
+		if tlsConfig.ServerName == "" {
+			tlsConfig.ServerName = host
+		}
 	}
 
 	dialer := &net.Dialer{Timeout: e.DialTimeout}
@@ -208,6 +217,13 @@ func (e *Email) dial() (*smtp.Client, error) {
 	c, err := smtp.NewClient(conn, host)
 	if err != nil {
 		conn.Close()
+		return nil, err
+	}
+	// Drive EHLO explicitly so we can surface its error. (*Client).Extension
+	// triggers a lazy hello() and swallows its error, which would silently
+	// treat a failed EHLO as "STARTTLS not advertised" and stay cleartext.
+	if err := c.Hello("localhost"); err != nil {
+		c.Close()
 		return nil, err
 	}
 	if ok, _ := c.Extension("STARTTLS"); ok {
