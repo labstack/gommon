@@ -129,6 +129,25 @@ func TestEmptyHeader(t *testing.T) {
 	assert.Contains(t, b.String(), `captain's log`)
 }
 
+// TestCallerFile verifies that both text and JSON log paths report the
+// user's call site, not an internal wrapper frame. This guards against
+// skip-count drift when the core log method is refactored.
+func TestCallerFile(t *testing.T) {
+	l := New("test")
+	l.SetHeader("${short_file}")
+	b := new(bytes.Buffer)
+	l.SetOutput(b)
+	l.SetLevel(DEBUG)
+
+	b.Reset()
+	l.Info("text call")
+	assert.Contains(t, b.String(), "log_test.go", "text path should report caller file")
+
+	b.Reset()
+	l.Infoj(JSON{"hello": "world"})
+	assert.Contains(t, b.String(), "log_test.go", "JSON path should report caller file")
+}
+
 func BenchmarkLog(b *testing.B) {
 	l := New("test")
 	l.SetOutput(new(bytes.Buffer))

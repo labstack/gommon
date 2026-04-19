@@ -31,10 +31,15 @@ var (
 
 func New() *Random {
 	// https://tip.golang.org/doc/go1.19#:~:text=Read%20no%20longer%20buffers%20random%20data%20obtained%20from%20the%20operating%20system%20between%20calls
-	p := sync.Pool{New: func() interface{} {
-		return bufio.NewReader(rand.Reader)
-	}}
-	return &Random{readerPool: p}
+	// sync.Pool must not be copied after first use; construct it directly
+	// on the struct to avoid copying from a local var.
+	return &Random{
+		readerPool: sync.Pool{
+			New: func() interface{} {
+				return bufio.NewReader(rand.Reader)
+			},
+		},
+	}
 }
 
 func (r *Random) String(length uint8, charsets ...string) string {

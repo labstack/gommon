@@ -14,9 +14,16 @@ import (
 
 type (
 	Email struct {
-		Auth        smtp.Auth
-		Header      map[string]string
-		Template    *template.Template
+		Auth     smtp.Auth
+		Header   map[string]string
+		Template *template.Template
+		// TLSConfig, when non-nil, is used for both implicit TLS (SMTPS)
+		// and STARTTLS. Callers that need a custom root pool or a
+		// specific server name should set this.
+		TLSConfig *tls.Config
+		// DialTimeout caps how long the initial connection waits.
+		// Zero means no caller-imposed timeout.
+		DialTimeout time.Duration
 		smtpAddress string
 	}
 
@@ -124,21 +131,13 @@ func (e *Email) Send(m *Message) (err error) {
 	m.buffer.WriteString(m.boundary)
 	m.buffer.WriteString("--")
 
-	// Dial
-	c, err := smtp.Dial(e.smtpAddress)
+	// Dial. Port 465 is SMTPS (implicit TLS) per IANA; everything else
+	// connects plaintext and upgrades via STARTTLS when advertised.
+	c, err := e.dial()
 	if err != nil {
 		return
 	}
 	defer c.Quit()
-
-	// Check if TLS is required
-	if ok, _ := c.Extension("STARTTLS"); ok {
-		host, _, _ := net.SplitHostPort(e.smtpAddress)
-		config := &tls.Config{ServerName: host}
-		if err = c.StartTLS(config); err != nil {
-			return err
-		}
-	}
 
 	// Authenticate
 	if e.Auth != nil {
@@ -171,4 +170,51 @@ func (e *Email) Send(m *Message) (err error) {
 	defer wc.Close()
 	_, err = m.buffer.WriteTo(wc)
 	return
+}
+
+func (e *Email) dial() (*smtp.Client, error) {
+	host, port, err := net.SplitHostPort(e.smtpAddress)
+	if err != nil {
+		return nil, err
+	}
+
+	tlsConfig := e.TLSConfig
+	if tlsConfig == nil {
+		tlsConfig = &tls.Config{ServerName: host}
+	} else if tlsConfig.ServerName == "" {
+		tlsConfig = tlsConfig.Clone()
+		tlsConfig.ServerName = host
+	}
+
+	dialer := &net.Dialer{Timeout: e.DialTimeout}
+
+	if port == "465" {
+		conn, err := tls.DialWithDialer(dialer, "tcp", e.smtpAddress, tlsConfig)
+		if err != nil {
+			return nil, err
+		}
+		c, err := smtp.NewClient(conn, host)
+		if err != nil {
+			conn.Close()
+			return nil, err
+		}
+		return c, nil
+	}
+
+	conn, err := dialer.Dial("tcp", e.smtpAddress)
+	if err != nil {
+		return nil, err
+	}
+	c, err := smtp.NewClient(conn, host)
+	if err != nil {
+		conn.Close()
+		return nil, err
+	}
+	if ok, _ := c.Extension("STARTTLS"); ok {
+		if err := c.StartTLS(tlsConfig); err != nil {
+			c.Close()
+			return nil, err
+		}
+	}
+	return c, nil
 }
