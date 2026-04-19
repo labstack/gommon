@@ -246,24 +246,26 @@ func TestBytesParse(t *testing.T) {
 		assert.Equal(t, int64(10133099161583616), b)
 	}
 
-	// EiB
-	b, err = Parse("8EiB")
+	// EiB — 7EiB stays within int64; 8EiB == 2^63 overflows and the
+	// float-to-int conversion of out-of-range values is
+	// implementation-dependent per the Go spec.
+	b, err = Parse("7EiB")
 	if assert.NoError(t, err) {
-		assert.True(t, math.MaxInt64 == b-1)
+		assert.Equal(t, int64(8070450532247928832), b)
 	}
-	b, err = Parse("8Ei")
+	b, err = Parse("7Ei")
 	if assert.NoError(t, err) {
-		assert.True(t, math.MaxInt64 == b-1)
+		assert.Equal(t, int64(8070450532247928832), b)
 	}
 
 	// EiB with spaces
-	b, err = Parse("8 EiB")
+	b, err = Parse("7 EiB")
 	if assert.NoError(t, err) {
-		assert.True(t, math.MaxInt64 == b-1)
+		assert.Equal(t, int64(8070450532247928832), b)
 	}
-	b, err = Parse("8 Ei")
+	b, err = Parse("7 Ei")
 	if assert.NoError(t, err) {
-		assert.True(t, math.MaxInt64 == b-1)
+		assert.Equal(t, int64(8070450532247928832), b)
 	}
 
 	// KB
