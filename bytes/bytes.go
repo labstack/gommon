@@ -45,13 +45,13 @@ func New() *Bytes {
 }
 
 // Format formats bytes integer to human readable string according to IEC 60027.
-// For example, 31323 bytes will return 30.59KB.
+// For example, 31323 bytes will return 30.59KiB.
 func (b *Bytes) Format(value int64) string {
 	return b.FormatBinary(value)
 }
 
 // FormatBinary formats bytes integer to human readable string according to IEC 60027.
-// For example, 31323 bytes will return 30.59KB.
+// For example, 31323 bytes will return 30.59KiB.
 func (*Bytes) FormatBinary(value int64) string {
 	multiple := ""
 	val := float64(value)
