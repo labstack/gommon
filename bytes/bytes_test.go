@@ -400,3 +400,13 @@ func TestBytesParse(t *testing.T) {
 		assert.Equal(t, int64(8000000000000000000), b)
 	}
 }
+
+func TestBytesParseTrimSpace(t *testing.T) {
+	b, err := Parse("  12KiB  ")
+	assert.NoError(t, err)
+	assert.Equal(t, int64(12288), b)
+
+	b, err = Parse("\t6GiB\n")
+	assert.NoError(t, err)
+	assert.Equal(t, int64(6442450944), b)
+}
