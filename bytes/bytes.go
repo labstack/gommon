@@ -122,6 +122,7 @@ func (*Bytes) FormatDecimal(value int64) string {
 // For example, 6GiB (6Gi is also valid) will return 6442450944, and
 // 6GB (6G is also valid) will return 6000000000.
 func (b *Bytes) Parse(value string) (int64, error) {
+	value = strings.TrimSpace(value)
 
 	i, err := b.ParseBinary(value)
 	if err == nil {
@@ -134,6 +135,7 @@ func (b *Bytes) Parse(value string) (int64, error) {
 // ParseBinary parses human readable bytes string to bytes integer.
 // For example, 6GiB (6Gi is also valid) will return 6442450944.
 func (*Bytes) ParseBinary(value string) (i int64, err error) {
+	value = strings.TrimSpace(value)
 	parts := patternBinary.FindStringSubmatch(value)
 	if len(parts) < 3 {
 		return 0, fmt.Errorf("error parsing value=%s", value)
@@ -166,6 +168,7 @@ func (*Bytes) ParseBinary(value string) (i int64, err error) {
 // ParseDecimal parses human readable bytes string to bytes integer.
 // For example, 6GB (6G is also valid) will return 6000000000.
 func (*Bytes) ParseDecimal(value string) (i int64, err error) {
+	value = strings.TrimSpace(value)
 	parts := patternDecimal.FindStringSubmatch(value)
 	if len(parts) < 3 {
 		return 0, fmt.Errorf("error parsing value=%s", value)
