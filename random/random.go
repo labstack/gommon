@@ -43,6 +43,10 @@ func New() *Random {
 }
 
 func (r *Random) String(length uint8, charsets ...string) string {
+	if length == 0 {
+		return ""
+	}
+
 	charset := strings.Join(charsets, "")
 	if charset == "" {
 		charset = Alphanumeric

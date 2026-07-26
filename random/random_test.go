@@ -28,6 +28,10 @@ func TestRandomString(t *testing.T) {
 			name:       "ok, 32",
 			whenLength: 32,
 		},
+		{
+			name:       "ok, 0",
+			whenLength: 0,
+		},
 	}
 
 	for _, tc := range testCases {
