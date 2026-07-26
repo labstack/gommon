@@ -118,6 +118,10 @@ func (l *Logger) SetLevel(level Lvl) {
 	atomic.StoreUint32(&l.level, uint32(level))
 }
 
+func (l *Logger) SetSkip(n int) {
+	l.skip = n
+}
+
 func (l *Logger) Output() io.Writer {
 	return l.output
 }
@@ -251,6 +255,14 @@ func Level() Lvl {
 
 func SetLevel(level Lvl) {
 	global.SetLevel(level)
+}
+
+func Skip() int {
+	return global.skip
+}
+
+func SetSkip(skip int) {
+	global.SetSkip(skip)
 }
 
 func Output() io.Writer {
