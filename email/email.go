@@ -115,7 +115,36 @@ func (e *Email) Send(m *Message) (err error) {
 	m.buffer.WriteString("\r\n")
 
 	// Message body
-	if m.BodyText != "" {
+	if m.BodyText != "" && m.BodyHTML != "" {
+		altBoundary := random.String(16)
+		m.writeHeader("Content-Type", "multipart/alternative; boundary="+altBoundary)
+		m.buffer.WriteString("\r\n")
+
+		// Write text/plain part
+		m.buffer.WriteString("--")
+		m.buffer.WriteString(altBoundary)
+		m.buffer.WriteString("\r\n")
+		m.writeHeader("Content-Type", "text/plain; charset=UTF-8")
+		m.buffer.WriteString("\r\n")
+		m.buffer.WriteString(m.BodyText)
+		m.buffer.WriteString("\r\n")
+		m.buffer.WriteString("\r\n")
+
+		// Write text/html part
+		m.buffer.WriteString("--")
+		m.buffer.WriteString(altBoundary)
+		m.buffer.WriteString("\r\n")
+		m.writeHeader("Content-Type", "text/html; charset=UTF-8")
+		m.buffer.WriteString("\r\n")
+		m.buffer.WriteString(m.BodyHTML)
+		m.buffer.WriteString("\r\n")
+		m.buffer.WriteString("\r\n")
+
+		// Close alternative boundary
+		m.buffer.WriteString("--")
+		m.buffer.WriteString(altBoundary)
+		m.buffer.WriteString("--\r\n")
+	} else if m.BodyText != "" {
 		m.writeText(m.BodyText, "text/plain")
 	} else if m.BodyHTML != "" {
 		m.writeText(m.BodyHTML, "text/html")
