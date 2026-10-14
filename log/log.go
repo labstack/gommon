@@ -137,6 +137,14 @@ func (l *Logger) SetHeader(h string) {
 	l.template = l.newTemplate(h)
 }
 
+func (l *Logger) HeaderSkip() int {
+	return l.skip
+}
+
+func (l *Logger) SetHeaderSkip(skip int) {
+	l.skip = skip
+}
+
 func (l *Logger) Print(i ...interface{}) {
 	l.log(0, fmt.Sprint(i...), false)
 }
@@ -263,6 +271,14 @@ func SetOutput(w io.Writer) {
 
 func SetHeader(h string) {
 	global.SetHeader(h)
+}
+
+func HeaderSkip() int {
+	return global.HeaderSkip()
+}
+
+func SetHeaderSkip(skip int) {
+	global.SetHeaderSkip(skip)
 }
 
 func Print(i ...interface{}) {
