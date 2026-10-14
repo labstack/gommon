@@ -148,6 +148,30 @@ func TestCallerFile(t *testing.T) {
 	assert.Contains(t, b.String(), "log_test.go", "JSON path should report caller file")
 }
 
+func TestConfigurableHeaderSkip(t *testing.T) {
+	l := New("test")
+	l.SetHeader("${short_file}")
+	b := new(bytes.Buffer)
+	l.SetOutput(b)
+	l.SetLevel(DEBUG)
+
+	assert.Equal(t, 2, l.HeaderSkip())
+
+	// Wrapping function that logs
+	var wrapperLog = func(msg string) {
+		l.Info(msg)
+	}
+
+	// Without adjusting skip, wrapperLog reports log_test.go inside wrapperLog (or test file depending on frames)
+	// Let's test custom skip
+	l.SetHeaderSkip(l.HeaderSkip() + 1)
+	assert.Equal(t, 3, l.HeaderSkip())
+
+	b.Reset()
+	wrapperLog("wrapped call")
+	assert.Contains(t, b.String(), "log_test.go")
+}
+
 func BenchmarkLog(b *testing.B) {
 	l := New("test")
 	l.SetOutput(new(bytes.Buffer))
