@@ -2,6 +2,7 @@ package bytes
 
 import (
 	"fmt"
+	"math/big"
 	"regexp"
 	"strconv"
 	"strings"
@@ -142,27 +143,23 @@ func (*Bytes) ParseBinary(value string) (i int64, err error) {
 	}
 	bytesString := parts[1]
 	multiple := strings.ToUpper(parts[2])
-	bytes, err := strconv.ParseFloat(bytesString, 64)
-	if err != nil {
-		return
-	}
+	unit := int64(1)
 
 	switch multiple {
 	case "KI", "KIB":
-		return int64(bytes * KiB), nil
+		unit = KiB
 	case "MI", "MIB":
-		return int64(bytes * MiB), nil
+		unit = MiB
 	case "GI", "GIB":
-		return int64(bytes * GiB), nil
+		unit = GiB
 	case "TI", "TIB":
-		return int64(bytes * TiB), nil
+		unit = TiB
 	case "PI", "PIB":
-		return int64(bytes * PiB), nil
+		unit = PiB
 	case "EI", "EIB":
-		return int64(bytes * EiB), nil
-	default:
-		return int64(bytes), nil
+		unit = EiB
 	}
+	return parseByteCount(bytesString, unit)
 }
 
 // ParseDecimal parses human readable bytes string to bytes integer.
@@ -175,27 +172,37 @@ func (*Bytes) ParseDecimal(value string) (i int64, err error) {
 	}
 	bytesString := parts[1]
 	multiple := strings.ToUpper(parts[2])
-	bytes, err := strconv.ParseFloat(bytesString, 64)
-	if err != nil {
-		return
-	}
+	unit := int64(1)
 
 	switch multiple {
 	case "K", "KB":
-		return int64(bytes * KB), nil
+		unit = KB
 	case "M", "MB":
-		return int64(bytes * MB), nil
+		unit = MB
 	case "G", "GB":
-		return int64(bytes * GB), nil
+		unit = GB
 	case "T", "TB":
-		return int64(bytes * TB), nil
+		unit = TB
 	case "P", "PB":
-		return int64(bytes * PB), nil
+		unit = PB
 	case "E", "EB":
-		return int64(bytes * EB), nil
-	default:
-		return int64(bytes), nil
+		unit = EB
 	}
+	return parseByteCount(bytesString, unit)
+}
+
+func parseByteCount(value string, unit int64) (int64, error) {
+	number, ok := new(big.Rat).SetString(value)
+	if !ok {
+		return 0, fmt.Errorf("error parsing value=%s", value)
+	}
+	number.Mul(number, big.NewRat(unit, 1))
+	// Truncate fractional bytes only after applying the unit, without float rounding.
+	whole := new(big.Int).Quo(number.Num(), number.Denom())
+	if !whole.IsInt64() {
+		return 0, fmt.Errorf("error parsing value=%s: %w", value, strconv.ErrRange)
+	}
+	return whole.Int64(), nil
 }
 
 // Format wraps global Bytes's Format function.
