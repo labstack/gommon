@@ -407,7 +407,8 @@ func (l *Logger) log(level Lvl, message string, jsonBody bool) {
 			buf.WriteString(message[1:])
 		} else {
 			buf.WriteString(`"message":`)
-			buf.WriteString(strconv.Quote(message))
+			messageJSON, _ := json.Marshal(message)
+			buf.Write(messageJSON)
 			buf.WriteString(`}`)
 		}
 	} else {
