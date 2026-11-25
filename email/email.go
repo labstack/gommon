@@ -164,7 +164,19 @@ func (e *Email) Send(m *Message) (err error) {
 	if err != nil {
 		return
 	}
-	for _, a := range to {
+	rcpts := append([]*mail.Address{}, to...)
+	// CC recipients are only cosmetic header entries unless they also
+	// receive an RCPT command: SMTP delivers solely to RCPT addresses,
+	// so without this a CC'd address never receives the message.
+	if m.CC != "" {
+		cc, cerr := mail.ParseAddressList(m.CC)
+		if cerr != nil {
+			err = cerr
+			return
+		}
+		rcpts = append(rcpts, cc...)
+	}
+	for _, a := range rcpts {
 		if err = c.Rcpt(a.Address); err != nil {
 			return
 		}
