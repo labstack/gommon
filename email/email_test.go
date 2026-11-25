@@ -91,3 +91,74 @@ func runFakeSMTP(ln net.Listener) <-chan struct{} {
 	}()
 	return done
 }
+
+// TestSend_CCRecipients verifies CC addresses receive RCPT commands, not
+// just the CC header: SMTP only delivers to RCPT recipients.
+func TestSend_CCRecipients(t *testing.T) {
+	ln, err := net.Listen("tcp", "127.0.0.1:0")
+	assert.NoError(t, err)
+	defer ln.Close()
+
+	rcpts := make(chan string, 8)
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		conn, err := ln.Accept()
+		if err != nil {
+			return
+		}
+		defer conn.Close()
+		conn.SetDeadline(time.Now().Add(5 * time.Second))
+
+		_, _ = conn.Write([]byte("220 fake.local ESMTP ready\r\n"))
+		r := bufio.NewReader(conn)
+		for {
+			line, err := r.ReadString('\n')
+			if err != nil {
+				return
+			}
+			upper := strings.ToUpper(strings.TrimSpace(line))
+			switch {
+			case strings.HasPrefix(upper, "EHLO"), strings.HasPrefix(upper, "HELO"):
+				_, _ = conn.Write([]byte("250-fake.local\r\n250 OK\r\n"))
+			case strings.HasPrefix(upper, "MAIL"):
+				_, _ = conn.Write([]byte("250 OK\r\n"))
+			case strings.HasPrefix(upper, "RCPT"):
+				rcpts <- line
+				_, _ = conn.Write([]byte("250 OK\r\n"))
+			case strings.HasPrefix(upper, "DATA"):
+				_, _ = conn.Write([]byte("354 go\r\n"))
+			case upper == ".":
+				_, _ = conn.Write([]byte("250 queued\r\n"))
+			case strings.HasPrefix(upper, "QUIT"):
+				_, _ = conn.Write([]byte("221 bye\r\n"))
+				return
+			default:
+				_, _ = conn.Write([]byte("250 OK\r\n"))
+			}
+		}
+	}()
+
+	e := New(ln.Addr().String())
+	e.DialTimeout = 2 * time.Second
+	m := &Message{
+		ID:       "<test@fake.local>",
+		From:     "sender@fake.local",
+		To:       "to@fake.local",
+		CC:       "cc1@fake.local, cc2@fake.local",
+		Subject:  "hi",
+		BodyText: "body",
+	}
+	err = e.Send(m)
+	assert.NoError(t, err)
+
+	got := []string{}
+	for len(rcpts) > 0 {
+		got = append(got, <-rcpts)
+	}
+	assert.Len(t, got, 3)
+	assert.Contains(t, got[0], "to@fake.local")
+	assert.Contains(t, got[1], "cc1@fake.local")
+	assert.Contains(t, got[2], "cc2@fake.local")
+	<-done
+}
