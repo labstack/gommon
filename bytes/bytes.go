@@ -44,6 +44,14 @@ func New() *Bytes {
 	return &Bytes{}
 }
 
+// magnitude returns the absolute byte count, including for the minimum int64.
+func magnitude(value int64) uint64 {
+	if value < 0 {
+		return -uint64(value)
+	}
+	return uint64(value)
+}
+
 // Format formats bytes integer to human readable string according to IEC 60027.
 // For example, 31323 bytes will return 30.59KiB.
 func (b *Bytes) Format(value int64) string {
@@ -55,24 +63,25 @@ func (b *Bytes) Format(value int64) string {
 func (*Bytes) FormatBinary(value int64) string {
 	multiple := ""
 	val := float64(value)
+	size := magnitude(value)
 
 	switch {
-	case value >= EiB:
+	case size >= EiB:
 		val /= EiB
 		multiple = "EiB"
-	case value >= PiB:
+	case size >= PiB:
 		val /= PiB
 		multiple = "PiB"
-	case value >= TiB:
+	case size >= TiB:
 		val /= TiB
 		multiple = "TiB"
-	case value >= GiB:
+	case size >= GiB:
 		val /= GiB
 		multiple = "GiB"
-	case value >= MiB:
+	case size >= MiB:
 		val /= MiB
 		multiple = "MiB"
-	case value >= KiB:
+	case size >= KiB:
 		val /= KiB
 		multiple = "KiB"
 	case value == 0:
@@ -89,24 +98,25 @@ func (*Bytes) FormatBinary(value int64) string {
 func (*Bytes) FormatDecimal(value int64) string {
 	multiple := ""
 	val := float64(value)
+	size := magnitude(value)
 
 	switch {
-	case value >= EB:
+	case size >= EB:
 		val /= EB
 		multiple = "EB"
-	case value >= PB:
+	case size >= PB:
 		val /= PB
 		multiple = "PB"
-	case value >= TB:
+	case size >= TB:
 		val /= TB
 		multiple = "TB"
-	case value >= GB:
+	case size >= GB:
 		val /= GB
 		multiple = "GB"
-	case value >= MB:
+	case size >= MB:
 		val /= MB
 		multiple = "MB"
-	case value >= KB:
+	case size >= KB:
 		val /= KB
 		multiple = "KB"
 	case value == 0:

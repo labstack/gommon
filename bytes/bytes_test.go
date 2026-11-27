@@ -410,3 +410,11 @@ func TestBytesParseTrimSpace(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, int64(6442450944), b)
 }
+
+func TestFormatNegativeByteDeltas(t *testing.T) {
+	assert.Equal(t, "-1.50KiB", Format(-1536))
+	assert.Equal(t, "-1.50MB", FormatDecimal(-1500000))
+	assert.Equal(t, "-8.00EiB", FormatBinary(math.MinInt64))
+	assert.Equal(t, "-9.22EB", FormatDecimal(math.MinInt64))
+	assert.Equal(t, "-999B", FormatDecimal(-999))
+}
